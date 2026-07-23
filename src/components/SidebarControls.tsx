@@ -223,8 +223,11 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
               {filteredTemplates.length > 0 ? (
                 filteredTemplates.map((tpl) => {
                   const cfg = tpl.config;
-                  const mainText = cfg.mainText || tpl.title;
-                  const subText = cfg.subText;
+                  const rawMainText = cfg.mainText || tpl.title;
+                  // Truncate to 5-6 key characters for maximum readability & big text size
+                  const shortPreviewText = rawMainText.length > 7 ? rawMainText.slice(0, 6) + '..' : rawMainText;
+                  const subText = cfg.subText ? (cfg.subText.length > 8 ? cfg.subText.slice(0, 7) + '..' : cfg.subText) : undefined;
+                  
                   const fontFamily = cfg.fontFamily || 'Black Han Sans';
                   const fillColor1 = cfg.fillColor1 || '#FFFFFF';
                   const fillColor2 = cfg.fillColor2;
@@ -232,7 +235,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
 
                   const textStyle: React.CSSProperties = {
                     fontFamily: `"${fontFamily}", sans-serif`,
-                    fontWeight: cfg.fontWeight || '700',
+                    fontWeight: cfg.fontWeight || '900',
                   };
 
                   if (isGradient) {
@@ -244,27 +247,29 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                   }
 
                   const strokeColor = cfg.strokeColor || '#000000';
-                  const strokeWidth = cfg.strokeEnabled ? Math.min(cfg.strokeWidth || 4, 2.5) : 0;
+                  const strokeWidth = cfg.strokeEnabled ? Math.min(cfg.strokeWidth || 5, 3.5) : 0;
 
                   if (strokeWidth > 0) {
                     const sw = strokeWidth;
-                    textStyle.textShadow = `-${sw}px -${sw}px 0 ${strokeColor}, ${sw}px -${sw}px 0 ${strokeColor}, -${sw}px ${sw}px 0 ${strokeColor}, ${sw}px ${sw}px 0 ${strokeColor}, 0 2px 4px rgba(0,0,0,0.8)`;
+                    textStyle.textShadow = `-${sw}px -${sw}px 0 ${strokeColor}, ${sw}px -${sw}px 0 ${strokeColor}, -${sw}px ${sw}px 0 ${strokeColor}, ${sw}px ${sw}px 0 ${strokeColor}, 0 3px 6px rgba(0,0,0,0.9)`;
                   } else if (cfg.shadowEnabled) {
-                    textStyle.textShadow = '0 2px 4px rgba(0,0,0,0.8)';
+                    textStyle.textShadow = '0 3px 6px rgba(0,0,0,0.9)';
                   }
 
                   if (cfg.glowEnabled && cfg.glowColor) {
-                    textStyle.filter = `drop-shadow(0 0 6px ${cfg.glowColor})`;
+                    textStyle.filter = `drop-shadow(0 0 8px ${cfg.glowColor})`;
                   }
 
                   const bgStyle: React.CSSProperties = {};
                   if (cfg.bgEnabled) {
                     bgStyle.backgroundColor = cfg.bgColor || '#000000';
-                    bgStyle.opacity = cfg.bgOpacity !== undefined ? cfg.bgOpacity : 0.9;
-                    bgStyle.borderRadius = cfg.shapeStyle === 'pill-badge' ? '999px' : `${Math.min(cfg.bgBorderRadius || 8, 10)}px`;
-                    bgStyle.padding = '4px 10px';
+                    bgStyle.opacity = cfg.bgOpacity !== undefined ? Math.max(0.85, cfg.bgOpacity) : 0.95;
+                    bgStyle.borderRadius = cfg.shapeStyle === 'pill-badge' ? '999px' : `${Math.min(cfg.bgBorderRadius || 8, 12)}px`;
+                    bgStyle.padding = '5px 12px';
                     if (cfg.bgBorderColor && (cfg.bgBorderWidth || 0) > 0) {
-                      bgStyle.border = `1.5px solid ${cfg.bgBorderColor}`;
+                      bgStyle.border = `2px solid ${cfg.bgBorderColor}`;
+                    } else {
+                      bgStyle.border = '1px solid rgba(255,255,255,0.15)';
                     }
                   }
 
@@ -274,22 +279,22 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                       onClick={() => onApplyPreset(tpl.config)}
                       className="group relative p-2.5 rounded-xl bg-slate-950 border border-slate-800/90 hover:border-indigo-500 cursor-pointer transition-all hover:scale-[1.02] shadow-md flex flex-col justify-between"
                     >
-                      {/* Realistic Visual Template Preview Box */}
-                      <div className="relative w-full h-20 rounded-lg bg-slate-900 border border-slate-850 mb-2 flex items-center justify-center p-2 overflow-hidden select-none group-hover:border-indigo-500/40 transition-all">
-                        {/* Subtle Grid Background Pattern */}
-                        <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:10px_10px] opacity-30 pointer-events-none" />
+                      {/* High Contrast Visual Template Preview Box */}
+                      <div className="relative w-full h-22 rounded-xl bg-slate-900/90 border border-slate-800 mb-2 flex items-center justify-center p-2 overflow-hidden select-none group-hover:border-indigo-500/50 transition-all shadow-inner">
+                        {/* High Contrast Neutral Grid Pattern Background */}
+                        <div className="absolute inset-0 bg-[radial-gradient(#475569_1.2px,transparent_1.2px)] [background-size:10px_10px] opacity-40 pointer-events-none" />
 
                         {/* Styled Preset Subtitle Text & Box */}
                         <div className="relative z-10 flex flex-col items-center justify-center text-center max-w-full px-1" style={bgStyle}>
                           <div
-                            className="text-xs sm:text-sm font-extrabold tracking-tight truncate max-w-full leading-snug"
+                            className="text-base sm:text-lg font-black tracking-tight truncate max-w-full leading-none py-0.5"
                             style={textStyle}
                           >
-                            {mainText}
+                            {shortPreviewText}
                           </div>
                           {subText && (
                             <div
-                              className="text-[10px] font-semibold tracking-wide truncate max-w-full mt-0.5"
+                              className="text-[11px] font-bold tracking-wide truncate max-w-full mt-0.5"
                               style={{
                                 color: cfg.subFillColor || '#94A3B8',
                                 fontFamily: `"${fontFamily}", sans-serif`,
