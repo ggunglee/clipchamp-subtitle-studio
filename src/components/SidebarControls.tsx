@@ -48,9 +48,14 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
       const matchesCategory = 
         selectedCategory === 'all' || 
         tpl.category === selectedCategory ||
-        (selectedCategory === 'youtube' && tpl.category === 'badge') ||
-        (selectedCategory === 'minimal' && tpl.category === 'caption-box') ||
-        (selectedCategory === 'speech-bubble' && (tpl.category === 'neon' || tpl.category === 'gaming'));
+        (selectedCategory === 'youtube' && (tpl.category === 'youtube' || tpl.category === 'badge')) ||
+        (selectedCategory === 'shorts' && (tpl.category === 'shorts' || tpl.category === 'youtube')) ||
+        (selectedCategory === 'vlog' && tpl.category === 'vlog') ||
+        (selectedCategory === 'speech' && (tpl.category === 'speech' || tpl.category === 'caption-box')) ||
+        (selectedCategory === 'corner' && (tpl.category === 'corner' || tpl.category === 'badge')) ||
+        (selectedCategory === 'news' && (tpl.category === 'news' || tpl.category === 'info-news')) ||
+        (selectedCategory === 'cinematic' && (tpl.category === 'cinematic' || tpl.category === 'cinema')) ||
+        (selectedCategory === 'gaming' && (tpl.category === 'gaming' || tpl.category === 'neon'));
 
       const matchesVibe = 
         selectedThemeVibe === 'all' ||
@@ -181,13 +186,14 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-indigo-300 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm"
                 >
                   <option value="all">🌟 전체 영상 용도 (All Uses)</option>
+                  <option value="speech">🗣️ 말자막 (대사 / 말풍선 / 하단 자막)</option>
+                  <option value="corner">📌 좌상단 / 우상단 코너 뱃지 (위치 & 라벨)</option>
                   <option value="youtube">🎬 유튜브 예능</option>
                   <option value="shorts">📱 숏폼 / 릴스 / 틱톡</option>
                   <option value="vlog">📹 브이로그 / 일상 / 여행</option>
-                  <option value="info-news">📰 시사 / 뉴스 / 지식 교양</option>
-                  <option value="cinema">🎬 영화 / 시네마 / 다큐</option>
+                  <option value="news">📰 시사 / 뉴스 / 지식 교양</option>
+                  <option value="cinematic">🎬 영화 / 시네마 / 다큐</option>
                   <option value="gaming">🎮 게임 / 스트리밍</option>
-                  <option value="lower-third">📺 인터뷰 / 하단 정보바</option>
                 </select>
               </div>
 
@@ -379,6 +385,48 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                   onChange={(e) => updateField('positionY', parseInt(e.target.value))}
                   className="w-full accent-indigo-500"
                 />
+              </div>
+            </div>
+
+            {/* 9-Grid Instant Position Helper */}
+            <div className="space-y-1.5 pt-2">
+              <label className="block text-xs font-semibold text-amber-400">
+                📍 1초 화면 위치 빠른 지정 (좌상단 / 우상단 / 하단 자막 등):
+              </label>
+              <div className="grid grid-cols-3 gap-1.5 p-2 bg-slate-950 rounded-xl border border-slate-800">
+                {[
+                  { label: '↖ 좌상단', x: 18, y: 15 },
+                  { label: '⬆ 상단중앙', x: 50, y: 15 },
+                  { label: '↗ 우상단', x: 82, y: 15 },
+                  { label: '◀ 좌측', x: 18, y: 50 },
+                  { label: '🎯 중앙', x: 50, y: 50 },
+                  { label: '▶ 우측', x: 82, y: 50 },
+                  { label: '↙ 좌하단', x: 18, y: 82 },
+                  { label: '⬇ 하단자막', x: 50, y: 82 },
+                  { label: '↘ 우하단', x: 82, y: 82 },
+                ].map((pos) => {
+                  const isSelected = config.positionX === pos.x && config.positionY === pos.y;
+                  return (
+                    <button
+                      key={pos.label}
+                      type="button"
+                      onClick={() => {
+                        onChangeConfig({
+                          ...config,
+                          positionX: pos.x,
+                          positionY: pos.y,
+                        });
+                      }}
+                      className={`py-1.5 text-[11px] font-bold rounded-lg border transition ${
+                        isSelected
+                          ? 'bg-amber-500 text-slate-950 border-amber-400 shadow'
+                          : 'bg-slate-900 hover:bg-slate-800 text-slate-300 border-slate-800'
+                      }`}
+                    >
+                      {pos.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>

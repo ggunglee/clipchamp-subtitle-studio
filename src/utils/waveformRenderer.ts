@@ -41,7 +41,7 @@ export function generateProceduralFrequencyData(count: number, timeSec: number):
 export function renderWaveformFrame(
   canvas: HTMLCanvasElement,
   config: WaveformConfig,
-  freqData: Uint8Array | null,
+  freqData: Uint8Array<ArrayBufferLike> | Uint8Array | null | any,
   ratio: CanvasRatio = '16:9',
   timeSec: number = 0
 ) {

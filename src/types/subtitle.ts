@@ -5,9 +5,17 @@ export type SubtitleCategory =
   | 'shorts'
   | 'vlog'
   | 'info-news'
-  | 'cinema' 
+  | 'news'
+  | 'cinema'
+  | 'cinematic' 
   | 'gaming' 
-  | 'lower-third';
+  | 'lower-third'
+  | 'speech'
+  | 'speech-bubble'
+  | 'corner'
+  | 'badge'
+  | 'caption-box'
+  | 'neon';
 
 export type ThemeVibe = 
   | 'all'
@@ -16,7 +24,8 @@ export type ThemeVibe =
   | 'cute-pop'
   | 'aesthetic-chill'
   | 'cinematic-classic'
-  | 'clean-news';
+  | 'clean-news'
+  | 'neon-cyber';
 
 export type AnimationType = 
   | 'none' 
@@ -25,7 +34,10 @@ export type AnimationType =
   | 'fade-in' 
   | 'dissolve'
   | 'slide-up' 
+  | 'slide-down'
   | 'slide-left' 
+  | 'slide-right'
+  | 'rise-up'
   | 'drop-down'
   | 'zoom-in'
   | 'zoom-out'
