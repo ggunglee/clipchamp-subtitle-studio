@@ -143,23 +143,49 @@ class SFXEngine {
           break;
         }
 
-        // ⌨️ 딸깍! (Click / Typewriter)
+        // ⌨️ 딸깍! / 타자기 소리 (Mechanical Typewriter Key Click)
         case 'click': {
+          // 1. Crisp Metallic Noise Click Transient (Highpass Noise)
+          const bufferSize = Math.floor(ctx.sampleRate * 0.02);
+          const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const noiseData = noiseBuffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            noiseData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.003));
+          }
+
+          const noise = ctx.createBufferSource();
+          noise.buffer = noiseBuffer;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'highpass';
+          filter.frequency.setValueAtTime(2500, now);
+
+          const noiseGain = ctx.createGain();
+          noiseGain.gain.setValueAtTime(0.35, now);
+          noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+
+          noise.connect(filter);
+          filter.connect(noiseGain);
+          noiseGain.connect(dest);
+
+          // 2. Mechanical Solid Body Key Tone (Triangle Pitch Drop)
           const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
+          const oscGain = ctx.createGain();
 
           osc.type = 'triangle';
-          osc.frequency.setValueAtTime(1200, now);
-          osc.frequency.exponentialRampToValueAtTime(400, now + 0.03);
+          osc.frequency.setValueAtTime(3200, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.015);
 
-          gain.gain.setValueAtTime(0.25, now);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+          oscGain.gain.setValueAtTime(0.2, now);
+          oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
 
-          osc.connect(gain);
-          gain.connect(dest);
+          osc.connect(oscGain);
+          oscGain.connect(dest);
 
+          noise.start(now);
           osc.start(now);
-          osc.stop(now + 0.04);
+          noise.stop(now + 0.025);
+          osc.stop(now + 0.025);
           break;
         }
 
