@@ -3133,7 +3133,7 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
     title: '⏱️ [우상단] 실시간 10초 흐르는 디지털 시계',
     category: 'corner',
     themeVibe: 'aesthetic-chill',
-    description: '지정한 시간(03:45:20 PM)부터 10초간 시계가 실제로 흐르는 애니메이션',
+    description: '현재 컴퓨터 시각(또는 직접 입력한 시간)부터 10초간 시계가 실제로 흐르는 애니메이션',
     previewColor: 'from-cyan-500 to-blue-700 text-white',
     config: {
       category: 'corner',

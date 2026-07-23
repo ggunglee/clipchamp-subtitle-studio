@@ -38,10 +38,12 @@ export function formatDynamicClock(
   if (mode === 'realtime-clock') {
     const timeMatch = mainText.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
     
-    let baseSec = config.clockStartSec !== undefined ? config.clockStartSec : (15 * 3600 + 45 * 60 + 20);
+    let baseSec: number;
     let is12Hour = true;
 
-    if (timeMatch) {
+    if (config.clockStartSec !== undefined) {
+      baseSec = config.clockStartSec;
+    } else if (timeMatch) {
       let hh = parseInt(timeMatch[1], 10);
       const mm = parseInt(timeMatch[2], 10);
       const ss = timeMatch[3] ? parseInt(timeMatch[3], 10) : 0;
@@ -55,6 +57,11 @@ export function formatDynamicClock(
         is12Hour = false;
       }
       baseSec = hh * 3600 + mm * 60 + ss;
+    } else {
+      // Default to actual current local computer time right now!
+      const now = new Date();
+      baseSec = now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds();
+      is12Hour = true;
     }
 
     const totalSec = baseSec + currentSecDelta;
