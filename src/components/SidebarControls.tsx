@@ -12,7 +12,8 @@ import {
   Layers,
   Clock,
   Search,
-  Filter
+  Filter,
+  Volume2
 } from 'lucide-react';
 import { SubtitleConfig, AnimationType, AnimTargetMode, SubtitleCategory } from '../types/subtitle';
 import { PRESET_TEMPLATES, GOOGLE_FONTS_LIST, DEFAULT_SUBTITLE_CONFIG } from '../constants/templates';
@@ -970,6 +971,43 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                 onChange={(e) => updateField('animationDuration', parseFloat(e.target.value))}
                 className="w-full accent-indigo-500 cursor-pointer"
               />
+            </div>
+
+            {/* Sound Effect (SFX) Selector */}
+            <div className="bg-slate-950 p-3 rounded-xl border border-slate-800 space-y-2">
+              <label className="block text-xs font-semibold text-emerald-300 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <Volume2 className="w-4 h-4 text-emerald-400" />
+                  오디오 효과음 직접 지정 (Custom SFX)
+                </span>
+                <span className="text-[10px] text-slate-400 font-normal">유튜브 모션 오디오</span>
+              </label>
+              <select
+                value={config.sfxType || 'auto'}
+                onChange={(e) => {
+                  const selectedSfx = e.target.value as any;
+                  updateField('sfxType', selectedSfx);
+                  if (selectedSfx !== 'none') {
+                    if (selectedSfx === 'auto') sfx.play('pop');
+                    else sfx.play(selectedSfx);
+                  }
+                }}
+                className="w-full bg-slate-900 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-100 focus:outline-none focus:border-emerald-500 font-medium cursor-pointer"
+              >
+                <option value="auto">🤖 [자동 감지] 애니메이션 특성에 맞춘 맞춤 효과음</option>
+                <option value="pop">💥 팝 / 뿅! (Pop - 귀여운 등장)</option>
+                <option value="whoosh">💨 슉 / 스윽! (Whoosh - 빠르게 이동/슬라이드)</option>
+                <option value="ding">🔔 띵! / 딩동! (Chime - 뱃지 & 상단 알림)</option>
+                <option value="click">⌨️ 딸깍! / 타자기 (Typewriter - 글자 타이핑)</option>
+                <option value="tick">⏱️ 째깍! (Tick - 시계 & 스톱워치)</option>
+                <option value="impact">🥁 두둥! / 충격음 (Impact - 예능 분노 & 3D 강조)</option>
+                <option value="glitch">⚡ 찌릿! / 사이버 네온 (Glitch - 네온 & 글리치)</option>
+                <option value="fanfare">🎺 빰빠카빰! / 하이라이트 (Fanfare - 랭킹 #1)</option>
+                <option value="none">🔇 무음 (이 자막 효과음 끄기)</option>
+              </select>
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                * [자동 감지] 모드를 선택하면 슬라이드는 '슉!', 팝업은 '뿅!', 뱃지는 '띵!' 등으로 알맞은 효과음이 자동 배치됩니다.
+              </p>
             </div>
           </div>
         )}

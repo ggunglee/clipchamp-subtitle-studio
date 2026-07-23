@@ -49,6 +49,7 @@ export const DEFAULT_SUBTITLE_CONFIG: SubtitleConfig = {
   animationDuration: 1.5,
   animationDelay: 0,
   animTargetMode: 'both',
+  sfxType: 'auto',
 };
 
 export const PRESET_TEMPLATES: PresetTemplate[] = [

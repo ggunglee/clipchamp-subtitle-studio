@@ -73,17 +73,36 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     };
   }, [config, ratio, isPlaying, progress]);
 
+  const playMatchingSFX = () => {
+    if (config.sfxType === 'none') return;
+    if (config.sfxType && config.sfxType !== 'auto') {
+      sfx.play(config.sfxType);
+      return;
+    }
+
+    // Auto matching logic
+    let sfxType: SFXType = 'pop';
+    if (config.category === 'corner') sfxType = 'ding';
+    else if (
+      config.animation === 'slide-up' ||
+      config.animation === 'slide-left' ||
+      config.animation === 'slide-down' ||
+      config.animation === 'slide-right' ||
+      config.animation === 'rise-up'
+    )
+      sfxType = 'whoosh';
+    else if (config.animation === 'glitch' || config.animation === 'neon-pulse') sfxType = 'glitch';
+    else if (config.animation === 'typewriter') sfxType = 'click';
+    else if (config.clockMode === 'realtime-clock' || config.clockMode === 'stopwatch') sfxType = 'tick';
+
+    sfx.play(sfxType);
+  };
+
   // Handle Play/Pause toggle
   const togglePlay = () => {
     if (!isPlaying) {
       startTimeRef.current = performance.now() - progress * (config.animationDuration * 1000);
-      let sfxType: SFXType = 'pop';
-      if (config.category === 'corner') sfxType = 'ding';
-      else if (config.animation === 'slide-up' || config.animation === 'slide-left' || config.animation === 'slide-down') sfxType = 'whoosh';
-      else if (config.animation === 'glitch' || config.animation === 'neon-pulse') sfxType = 'glitch';
-      else if (config.animation === 'typewriter') sfxType = 'click';
-
-      sfx.play(sfxType);
+      playMatchingSFX();
     }
     setIsPlaying(!isPlaying);
   };
@@ -92,14 +111,7 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     startTimeRef.current = performance.now();
     setProgress(0);
     setIsPlaying(true);
-
-    let sfxType: SFXType = 'pop';
-    if (config.category === 'corner') sfxType = 'ding';
-    else if (config.animation === 'slide-up' || config.animation === 'slide-left' || config.animation === 'slide-down') sfxType = 'whoosh';
-    else if (config.animation === 'glitch' || config.animation === 'neon-pulse') sfxType = 'glitch';
-    else if (config.animation === 'typewriter') sfxType = 'click';
-
-    sfx.play(sfxType);
+    playMatchingSFX();
   };
 
   // Handle Custom Video Upload

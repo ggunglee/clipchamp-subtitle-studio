@@ -139,6 +139,9 @@ export interface SubtitleConfig {
   clockMode?: 'none' | 'realtime-clock' | 'stopwatch' | 'countdown';
   clockStartSec?: number;
   clockDurationSec?: number;
+
+  // Custom User Sound Effect Selection
+  sfxType?: 'auto' | 'pop' | 'whoosh' | 'ding' | 'click' | 'tick' | 'impact' | 'glitch' | 'fanfare' | 'chart-rise' | 'none';
 }
 
 export interface PresetTemplate {

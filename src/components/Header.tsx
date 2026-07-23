@@ -112,12 +112,12 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right Actions: SFX Sound Toggle, Clipchamp Guide, Waveform, Chart, Batch, Export Buttons */}
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
           {/* YouTube Editing SFX Toggle Button */}
           {onToggleMute && (
             <button
               onClick={onToggleMute}
-              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-all shadow-sm ${
+              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all shadow-sm ${
                 !isMuted
                   ? 'bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border-emerald-800/60'
                   : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border-slate-800'
@@ -127,12 +127,12 @@ export const Header: React.FC<HeaderProps> = ({
               {!isMuted ? (
                 <>
                   <Volume2 className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-                  <span className="hidden md:inline">🔊 효과음 ON</span>
+                  <span>🔊 효과음 ON</span>
                 </>
               ) : (
                 <>
                   <VolumeX className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="hidden md:inline">🔇 무음</span>
+                  <span>🔇 무음</span>
                 </>
               )}
             </button>
@@ -141,37 +141,37 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Clipchamp Guide Modal Button */}
           <button
             onClick={onOpenGuide}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-purple-950/60 hover:bg-purple-900/80 text-purple-200 border border-purple-800/50 transition-all shadow-sm"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-purple-950/60 hover:bg-purple-900/80 text-purple-200 border border-purple-800/50 transition-all shadow-sm"
           >
             <HelpCircle className="w-3.5 h-3.5 text-purple-400" />
-            <span className="hidden sm:inline">Clipchamp 가이드</span>
+            <span>Clipchamp 가이드</span>
           </button>
 
           {/* Audio Waveform Studio Button */}
           <button
             onClick={onOpenWaveform}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-200 border border-cyan-800/50 transition-all shadow-sm"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-200 border border-cyan-800/50 transition-all shadow-sm"
           >
             <Sparkles className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span className="hidden sm:inline">🎵 음파 비주얼라이저</span>
+            <span>🎵 음파 비주얼라이저</span>
           </button>
 
           {/* Chart Builder Modal Button */}
           <button
             onClick={onOpenChart}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-amber-950/60 hover:bg-amber-900/80 text-amber-200 border border-amber-800/50 transition-all shadow-sm"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-amber-950/60 hover:bg-amber-900/80 text-amber-200 border border-amber-800/50 transition-all shadow-sm"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">📊 모션 차트</span>
+            <span>📊 모션 차트</span>
           </button>
 
           {/* Batch Generator Button */}
           <button
             onClick={onOpenBatch}
-            className="flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all"
           >
             <FileArchive className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">대사 일괄 생성 (ZIP)</span>
+            <span>📚 대사 일괄 생성</span>
           </button>
 
           {/* Export PNG */}
