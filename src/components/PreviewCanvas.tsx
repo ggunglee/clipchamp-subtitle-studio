@@ -77,9 +77,9 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     if (config.sfxType === 'none') return;
 
     if (config.animation === 'typewriter' || config.sfxType === 'click') {
-      const charCount = (config.mainText || '').length || 8;
+      const textToType = config.mainText || '오늘의 하이라이트!';
       const durationSec = config.animationDuration || 1.5;
-      sfx.playTypewriterSequence(charCount, durationSec);
+      sfx.playTypewriterSequence(textToType, durationSec);
       return;
     }
 

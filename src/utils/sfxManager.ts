@@ -54,9 +54,9 @@ class SFXEngine {
 
   /**
    * Plays a rapid sequential mechanical typewriter key click typing sequence (탁-탁-탁-탁-탁!)
-   * matching text length and animation duration.
+   * matching text length and animation duration with 100% exact time synchronization.
    */
-  public playTypewriterSequence(charCount: number, durationSec: number, customCtx?: AudioContext, targetNode?: AudioNode) {
+  public playTypewriterSequence(text: string, durationSec: number, customCtx?: AudioContext, targetNode?: AudioNode) {
     if (this.isMuted && !customCtx) return;
 
     try {
@@ -64,14 +64,22 @@ class SFXEngine {
       const now = ctx.currentTime;
       const dest = targetNode || ctx.destination;
 
-      const validCharCount = Math.max(1, Math.min(charCount, 50));
-      const interval = Math.max(0.045, (durationSec * 0.85) / validCharCount);
+      const charCount = text ? text.length : 8;
+      if (charCount <= 0) return;
 
-      for (let i = 0; i < validCharCount; i++) {
-        const clickTime = now + i * interval;
-        const randomPitchOffset = (Math.random() - 0.5) * 400;
-        const keyFreq = 3000 + randomPitchOffset;
+      const validDuration = Math.max(0.2, durationSec);
 
+      for (let i = 0; i < charCount; i++) {
+        const char = text[i];
+        // 100% Exact frame synchronization with Math.floor((time/duration) * charCount)
+        const clickTime = now + (i / charCount) * validDuration;
+        
+        // Spacebar gets a soft low mechanical thud
+        const isSpace = char === ' ';
+        const randomPitchOffset = (Math.random() - 0.5) * 300;
+        const keyFreq = isSpace ? 1200 : (3200 + randomPitchOffset);
+
+        // Metallic noise click
         const bufferSize = Math.floor(ctx.sampleRate * 0.015);
         const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
         const noiseData = noiseBuffer.getChannelData(0);
@@ -84,24 +92,25 @@ class SFXEngine {
 
         const filter = ctx.createBiquadFilter();
         filter.type = 'highpass';
-        filter.frequency.setValueAtTime(2400 + randomPitchOffset * 0.5, clickTime);
+        filter.frequency.setValueAtTime(isSpace ? 1500 : (2400 + randomPitchOffset * 0.5), clickTime);
 
         const noiseGain = ctx.createGain();
-        noiseGain.gain.setValueAtTime(0.3, clickTime);
+        noiseGain.gain.setValueAtTime(isSpace ? 0.15 : 0.3, clickTime);
         noiseGain.gain.exponentialRampToValueAtTime(0.001, clickTime + 0.018);
 
         noise.connect(filter);
         filter.connect(noiseGain);
         noiseGain.connect(dest);
 
+        // Solid Body Key Tone
         const osc = ctx.createOscillator();
         const oscGain = ctx.createGain();
 
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(keyFreq, clickTime);
-        osc.frequency.exponentialRampToValueAtTime(800, clickTime + 0.015);
+        osc.frequency.exponentialRampToValueAtTime(isSpace ? 400 : 800, clickTime + 0.015);
 
-        oscGain.gain.setValueAtTime(0.18, clickTime);
+        oscGain.gain.setValueAtTime(isSpace ? 0.12 : 0.18, clickTime);
         oscGain.gain.exponentialRampToValueAtTime(0.001, clickTime + 0.018);
 
         osc.connect(oscGain);
