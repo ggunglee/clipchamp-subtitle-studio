@@ -223,10 +223,18 @@ function calculateAnimState(
       break;
     }
     case 'typewriter': {
-      const charCount = Math.floor(clampT * mainText.length);
+      // Complete typing at 85% of duration so final character is never truncated
+      const typingProgress = Math.min(1.0, clampT / 0.85);
+      const charCount = clampT === 0
+        ? 0
+        : Math.min(mainText.length, Math.floor(typingProgress * mainText.length) + 1);
+
       displayedMainText = mainText.slice(0, charCount);
+
       if (subText) {
-        const subCharCount = Math.floor(clampT * subText.length);
+        const subCharCount = clampT === 0
+          ? 0
+          : Math.min(subText.length, Math.floor(typingProgress * subText.length) + 1);
         displayedSubText = subText.slice(0, subCharCount);
       }
       break;

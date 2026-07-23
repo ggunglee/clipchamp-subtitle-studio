@@ -73,11 +73,12 @@ class SFXEngine {
       if (charCount <= 0) return;
 
       const validDuration = Math.max(0.2, durationSec);
+      const typingDuration = validDuration * 0.85;
 
       for (let i = 0; i < charCount; i++) {
         const char = text[i];
-        // 100% Exact frame synchronization with Math.floor((time/duration) * charCount)
-        const clickTime = now + (i / charCount) * validDuration;
+        // 100% Exact frame synchronization with canvasRenderer typingProgress
+        const clickTime = now + (i / charCount) * typingDuration;
         
         // Spacebar gets a soft low mechanical thud
         const isSpace = char === ' ';
