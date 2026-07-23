@@ -8,7 +8,9 @@ import {
   Smartphone, 
   Square,
   Layers,
-  FileArchive
+  FileArchive,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
 import { CanvasRatio } from '../types/subtitle';
 
@@ -23,6 +25,8 @@ interface HeaderProps {
   onExportWebM: () => void;
   isExportingWebM: boolean;
   exportWebMProgress: number;
+  isMuted?: boolean;
+  onToggleMute?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -36,6 +40,8 @@ export const Header: React.FC<HeaderProps> = ({
   onExportWebM,
   isExportingWebM,
   exportWebMProgress,
+  isMuted = false,
+  onToggleMute,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
@@ -105,8 +111,33 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
 
-        {/* Right Actions: Clipchamp Guide, Waveform, Chart, Batch, Export Buttons */}
+        {/* Right Actions: SFX Sound Toggle, Clipchamp Guide, Waveform, Chart, Batch, Export Buttons */}
         <div className="flex items-center space-x-2">
+          {/* YouTube Editing SFX Toggle Button */}
+          {onToggleMute && (
+            <button
+              onClick={onToggleMute}
+              className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg text-xs font-semibold border transition-all shadow-sm ${
+                !isMuted
+                  ? 'bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 border-emerald-800/60'
+                  : 'bg-slate-900 hover:bg-slate-800 text-slate-400 border-slate-800'
+              }`}
+              title={!isMuted ? '유튜브 효과음 재생 중 (클릭 시 무음)' : '효과음 무음 상태 (클릭 시 재생)'}
+            >
+              {!isMuted ? (
+                <>
+                  <Volume2 className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
+                  <span className="hidden md:inline">🔊 효과음 ON</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX className="w-3.5 h-3.5 text-slate-500" />
+                  <span className="hidden md:inline">🔇 무음</span>
+                </>
+              )}
+            </button>
+          )}
+
           {/* Clipchamp Guide Modal Button */}
           <button
             onClick={onOpenGuide}

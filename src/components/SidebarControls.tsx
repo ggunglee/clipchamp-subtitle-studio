@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { SubtitleConfig, AnimationType, AnimTargetMode, SubtitleCategory } from '../types/subtitle';
 import { PRESET_TEMPLATES, GOOGLE_FONTS_LIST, DEFAULT_SUBTITLE_CONFIG } from '../constants/templates';
+import { sfx, SFXType } from '../utils/sfxManager';
 
 interface SidebarControlsProps {
   config: SubtitleConfig;
@@ -276,7 +277,16 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                   return (
                     <div
                       key={tpl.id}
-                      onClick={() => onApplyPreset(tpl.config)}
+                      onClick={() => {
+                        let sfxType: SFXType = 'pop';
+                        if (tpl.category === 'corner') sfxType = 'ding';
+                        else if (tpl.themeVibe === 'bold-fire') sfxType = 'impact';
+                        else if (tpl.config.animation === 'slide-up' || tpl.config.animation === 'slide-left' || tpl.config.animation === 'slide-down') sfxType = 'whoosh';
+                        else if (tpl.config.animation === 'glitch' || tpl.config.animation === 'neon-pulse') sfxType = 'glitch';
+
+                        sfx.play(sfxType);
+                        onApplyPreset(tpl.config);
+                      }}
                       className="group relative p-2.5 rounded-xl bg-slate-950 border border-slate-800/90 hover:border-indigo-500 cursor-pointer transition-all hover:scale-[1.02] shadow-md flex flex-col justify-between"
                     >
                       {/* High Contrast Visual Template Preview Box */}

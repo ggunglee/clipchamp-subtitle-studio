@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { SubtitleConfig, CanvasRatio } from '../types/subtitle';
 import { renderSubtitleToCanvas, getCanvasDimensions } from '../utils/canvasRenderer';
+import { sfx, SFXType } from '../utils/sfxManager';
 
 interface PreviewCanvasProps {
   config: SubtitleConfig;
@@ -76,6 +77,13 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
   const togglePlay = () => {
     if (!isPlaying) {
       startTimeRef.current = performance.now() - progress * (config.animationDuration * 1000);
+      let sfxType: SFXType = 'pop';
+      if (config.category === 'corner') sfxType = 'ding';
+      else if (config.animation === 'slide-up' || config.animation === 'slide-left' || config.animation === 'slide-down') sfxType = 'whoosh';
+      else if (config.animation === 'glitch' || config.animation === 'neon-pulse') sfxType = 'glitch';
+      else if (config.animation === 'typewriter') sfxType = 'click';
+
+      sfx.play(sfxType);
     }
     setIsPlaying(!isPlaying);
   };
@@ -84,6 +92,14 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     startTimeRef.current = performance.now();
     setProgress(0);
     setIsPlaying(true);
+
+    let sfxType: SFXType = 'pop';
+    if (config.category === 'corner') sfxType = 'ding';
+    else if (config.animation === 'slide-up' || config.animation === 'slide-left' || config.animation === 'slide-down') sfxType = 'whoosh';
+    else if (config.animation === 'glitch' || config.animation === 'neon-pulse') sfxType = 'glitch';
+    else if (config.animation === 'typewriter') sfxType = 'click';
+
+    sfx.play(sfxType);
   };
 
   // Handle Custom Video Upload

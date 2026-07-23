@@ -11,6 +11,8 @@ import { SubtitleConfig, CanvasRatio } from './types/subtitle';
 import { DEFAULT_SUBTITLE_CONFIG } from './constants/templates';
 import { exportAsPng, exportAsWebMVideo } from './utils/exportUtils';
 
+import { sfx } from './utils/sfxManager';
+
 export function App() {
   const [config, setConfig] = useState<SubtitleConfig>(DEFAULT_SUBTITLE_CONFIG);
   const [ratio, setRatio] = useState<CanvasRatio>('16:9');
@@ -20,6 +22,18 @@ export function App() {
   const [isBatchOpen, setIsBatchOpen] = useState<boolean>(false);
   const [isChartOpen, setIsChartOpen] = useState<boolean>(false);
   const [isWaveformOpen, setIsWaveformOpen] = useState<boolean>(false);
+
+  // SFX Sound Toggle State
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+
+  const handleToggleMute = () => {
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    sfx.setMuted(nextMuted);
+    if (!nextMuted) {
+      sfx.play('ding');
+    }
+  };
   
   // Export WebM status
   const [isExportingWebM, setIsExportingWebM] = useState<boolean>(false);
@@ -90,6 +104,8 @@ export function App() {
         onExportWebM={handleExportWebM}
         isExportingWebM={isExportingWebM}
         exportWebMProgress={exportWebMProgress}
+        isMuted={isMuted}
+        onToggleMute={handleToggleMute}
       />
 
       {/* Main Workspace Layout */}

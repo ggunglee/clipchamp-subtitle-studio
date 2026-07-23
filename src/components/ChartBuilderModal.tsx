@@ -24,6 +24,7 @@ import {
 } from '../types/chart';
 import { renderChartFrame, exportChartAsSingleWebMVideo, exportChartAsPNG } from '../utils/chartCanvasRenderer';
 import { CanvasRatio } from '../types/subtitle';
+import { sfx } from '../utils/sfxManager';
 
 interface ChartBuilderModalProps {
   isOpen: boolean;
@@ -89,6 +90,7 @@ export const ChartBuilderModal: React.FC<ChartBuilderModalProps> = ({
   if (!isOpen) return null;
 
   const handleReplay = () => {
+    sfx.play('chart-rise');
     setProgress(0);
     setIsPlaying(true);
     startTimeRef.current = null;
