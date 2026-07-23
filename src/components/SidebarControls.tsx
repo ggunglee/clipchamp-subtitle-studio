@@ -78,67 +78,72 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
   return (
     <div className="w-full bg-slate-900/90 backdrop-blur border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-[750px] max-h-[85vh] shadow-xl">
       
-      {/* Sidebar Header Tabs */}
+      {/* Sidebar Header Tabs (5-Column Grid Layout - No Horizontal Scrolling Needed) */}
       <div className="border-b border-slate-800 bg-slate-950 p-2">
-        <div className="flex items-center gap-1.5 overflow-x-auto custom-scrollbar pb-1">
+        <div className="grid grid-cols-5 gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800">
           <button
             onClick={() => setActiveTab('templates')}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-extrabold transition-all text-center ${
               activeTab === 'templates'
                 ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-slate-900/80 text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
+            title="프리셋 템플릿 탐색기"
           >
-            <Palette className="w-3.5 h-3.5" />
-            <span>🎨 템플릿 ({PRESET_TEMPLATES.length})</span>
+            <Palette className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">🎨 템플릿</span>
           </button>
 
           <button
             onClick={() => setActiveTab('text')}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-extrabold transition-all text-center ${
               activeTab === 'text'
                 ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-slate-900/80 text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
+            title="텍스트 & 글씨체 설정"
           >
-            <Type className="w-3.5 h-3.5" />
-            <span>✍️ 텍스트/폰트</span>
+            <Type className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">✍️ 텍스트</span>
           </button>
 
           <button
             onClick={() => setActiveTab('style')}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-extrabold transition-all text-center ${
               activeTab === 'style'
                 ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-slate-900/80 text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
+            title="색상, 3D 테두리 및 그림자"
           >
-            <Paintbrush className="w-3.5 h-3.5" />
-            <span>🌈 색상/외곽선</span>
+            <Paintbrush className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">🌈 색상</span>
           </button>
 
           <button
             onClick={() => setActiveTab('shape')}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-extrabold transition-all text-center ${
               activeTab === 'shape'
                 ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-slate-900/80 text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
+            title="배경 박스, 뱃지 및 특수 모양"
           >
-            <Box className="w-3.5 h-3.5" />
-            <span>📐 배경/모양</span>
+            <Box className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">📐 배경</span>
           </button>
 
           <button
             onClick={() => setActiveTab('animation')}
-            className={`flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 ${
+            className={`flex flex-col sm:flex-row items-center justify-center gap-1 py-2 px-1 rounded-xl text-[11px] font-extrabold transition-all text-center ${
               activeTab === 'animation'
                 ? 'bg-indigo-600 text-white shadow-md'
-                : 'bg-slate-900/80 text-slate-400 hover:bg-slate-900 hover:text-slate-200'
+                : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
             }`}
+            title="모션 애니메이션 및 오디오 효과음"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>✨ 애니메이션</span>
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">✨ 모션</span>
           </button>
         </div>
       </div>
