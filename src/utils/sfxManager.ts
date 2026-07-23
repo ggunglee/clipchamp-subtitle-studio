@@ -12,7 +12,12 @@ export type SFXType =
   | 'impact'        // 🥁 두둥! (Impact/Shock - 분노 및 강조 자막)
   | 'glitch'        // ⚡ 찌릿! (Neon Glitch - 사이버 네온 및 글리치)
   | 'fanfare'       // 🎺 빰빠카빰! (Fanfare - 랭킹 1위 & 하이라이트)
-  | 'chart-rise';   // 📊 차트 상승음 (Rising Arpeggio - 차트 렌더링)
+  | 'chart-rise'    // 📊 차트 상승음 (Rising Arpeggio - 차트 렌더링)
+  | 'netflix'       // 🎬 넷플릭스 두둥! (Netflix TUDUM Sub Bass Drop)
+  | 'dung-tak'      // 🥁 둥탁! (Dung-Tak Variety Kick-Snare Thump Snap)
+  | 'boom'          // 💥 시네마틱 웅장 붐 (Cinematic Sub Boom)
+  | 'thunder'       // ⚡ 천둥 쿠쿵! (Thunder Sub Shock)
+  | 'sad-trom';     // 🎺 썰렁/꽈당 (Fail Horn Brass Drop);
 
 class SFXEngine {
   private ctx: AudioContext | null = null;
@@ -366,6 +371,160 @@ class SFXEngine {
 
             osc.start(startTime);
             osc.stop(startTime + 0.2);
+          });
+          break;
+        }
+
+        // 🎬 넷플릭스 두둥! (Netflix TUDUM Sub Bass Drop)
+        case 'netflix': {
+          const osc1 = ctx.createOscillator();
+          const osc2 = ctx.createOscillator();
+          const gain = ctx.createGain();
+
+          osc1.type = 'sine';
+          osc2.type = 'triangle';
+
+          osc1.frequency.setValueAtTime(110, now);
+          osc1.frequency.exponentialRampToValueAtTime(42, now + 0.45);
+
+          osc2.frequency.setValueAtTime(220, now);
+          osc2.frequency.exponentialRampToValueAtTime(84, now + 0.45);
+
+          gain.gain.setValueAtTime(0.6, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(dest);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 0.6);
+          osc2.stop(now + 0.6);
+          break;
+        }
+
+        // 🥁 둥탁! (Dung-Tak Variety Thump Snap)
+        case 'dung-tak': {
+          // 1. "둥!" (Low Kick Boom)
+          const kickOsc = ctx.createOscillator();
+          const kickGain = ctx.createGain();
+
+          kickOsc.type = 'sine';
+          kickOsc.frequency.setValueAtTime(130, now);
+          kickOsc.frequency.exponentialRampToValueAtTime(35, now + 0.12);
+
+          kickGain.gain.setValueAtTime(0.65, now);
+          kickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+          kickOsc.connect(kickGain);
+          kickGain.connect(dest);
+
+          kickOsc.start(now);
+          kickOsc.stop(now + 0.15);
+
+          // 2. "탁!" (Snare Rimshot Snap at now + 0.11s)
+          const takTime = now + 0.11;
+          const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * 0.08, ctx.sampleRate);
+          const noiseData = noiseBuffer.getChannelData(0);
+          for (let i = 0; i < noiseData.length; i++) {
+            noiseData[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.015));
+          }
+
+          const noise = ctx.createBufferSource();
+          noise.buffer = noiseBuffer;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'highpass';
+          filter.frequency.setValueAtTime(3200, takTime);
+
+          const takGain = ctx.createGain();
+          takGain.gain.setValueAtTime(0.45, takTime);
+          takGain.gain.exponentialRampToValueAtTime(0.001, takTime + 0.08);
+
+          noise.connect(filter);
+          filter.connect(takGain);
+          takGain.connect(dest);
+
+          noise.start(takTime);
+          noise.stop(takTime + 0.09);
+          break;
+        }
+
+        // 💥 시네마틱 웅장 붐 (Cinematic Sub Boom)
+        case 'boom': {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          const filter = ctx.createBiquadFilter();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(70, now);
+          osc.frequency.exponentialRampToValueAtTime(25, now + 0.7);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(280, now);
+          filter.frequency.exponentialRampToValueAtTime(45, now + 0.7);
+
+          gain.gain.setValueAtTime(0.7, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(dest);
+
+          osc.start(now);
+          osc.stop(now + 0.75);
+          break;
+        }
+
+        // ⚡ 천둥 쿠쿵! (Thunder Sub Shock)
+        case 'thunder': {
+          const bufferSize = Math.floor(ctx.sampleRate * 0.5);
+          const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (ctx.sampleRate * 0.1));
+          }
+
+          const noise = ctx.createBufferSource();
+          noise.buffer = buffer;
+
+          const filter = ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(200, now);
+
+          const gain = ctx.createGain();
+          gain.gain.setValueAtTime(0.6, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(dest);
+
+          noise.start(now);
+          noise.stop(now + 0.5);
+          break;
+        }
+
+        // 🎺 썰렁 / 꽈당음 (Fail Horn Brass Drop)
+        case 'sad-trom': {
+          const steps = [280, 240, 200, 160];
+          steps.forEach((freq, idx) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            const stepTime = now + idx * 0.12;
+
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, stepTime);
+
+            gain.gain.setValueAtTime(0.3, stepTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, stepTime + 0.12);
+
+            osc.connect(gain);
+            gain.connect(dest);
+
+            osc.start(stepTime);
+            osc.stop(stepTime + 0.12);
           });
           break;
         }

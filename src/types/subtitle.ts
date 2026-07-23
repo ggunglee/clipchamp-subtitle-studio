@@ -141,7 +141,7 @@ export interface SubtitleConfig {
   clockDurationSec?: number;
 
   // Custom User Sound Effect Selection
-  sfxType?: 'auto' | 'pop' | 'whoosh' | 'ding' | 'click' | 'tick' | 'impact' | 'glitch' | 'fanfare' | 'chart-rise' | 'none';
+  sfxType?: 'auto' | 'pop' | 'whoosh' | 'ding' | 'click' | 'tick' | 'impact' | 'glitch' | 'fanfare' | 'chart-rise' | 'netflix' | 'dung-tak' | 'boom' | 'thunder' | 'sad-trom' | 'none';
 }
 
 export interface PresetTemplate {
