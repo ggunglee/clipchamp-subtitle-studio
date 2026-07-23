@@ -221,23 +221,99 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
             {/* Filtered Template Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filteredTemplates.length > 0 ? (
-                filteredTemplates.map((tpl) => (
-                  <div
-                    key={tpl.id}
-                    onClick={() => onApplyPreset(tpl.config)}
-                    className="group relative p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-indigo-500/60 cursor-pointer transition-all hover:scale-[1.02] shadow-md"
-                  >
-                    <div className={`w-full h-12 rounded-lg bg-gradient-to-r ${tpl.previewColor} mb-2 flex items-center justify-center font-extrabold text-xs shadow-inner px-2 text-center truncate`}>
-                      {tpl.title}
+                filteredTemplates.map((tpl) => {
+                  const cfg = tpl.config;
+                  const mainText = cfg.mainText || tpl.title;
+                  const subText = cfg.subText;
+                  const fontFamily = cfg.fontFamily || 'Black Han Sans';
+                  const fillColor1 = cfg.fillColor1 || '#FFFFFF';
+                  const fillColor2 = cfg.fillColor2;
+                  const isGradient = cfg.fillType === 'linear-gradient' && fillColor2;
+
+                  const textStyle: React.CSSProperties = {
+                    fontFamily: `"${fontFamily}", sans-serif`,
+                    fontWeight: cfg.fontWeight || '700',
+                  };
+
+                  if (isGradient) {
+                    textStyle.backgroundImage = `linear-gradient(135deg, ${fillColor1}, ${fillColor2})`;
+                    textStyle.WebkitBackgroundClip = 'text';
+                    textStyle.WebkitTextFillColor = 'transparent';
+                  } else {
+                    textStyle.color = fillColor1;
+                  }
+
+                  const strokeColor = cfg.strokeColor || '#000000';
+                  const strokeWidth = cfg.strokeEnabled ? Math.min(cfg.strokeWidth || 4, 2.5) : 0;
+
+                  if (strokeWidth > 0) {
+                    const sw = strokeWidth;
+                    textStyle.textShadow = `-${sw}px -${sw}px 0 ${strokeColor}, ${sw}px -${sw}px 0 ${strokeColor}, -${sw}px ${sw}px 0 ${strokeColor}, ${sw}px ${sw}px 0 ${strokeColor}, 0 2px 4px rgba(0,0,0,0.8)`;
+                  } else if (cfg.shadowEnabled) {
+                    textStyle.textShadow = '0 2px 4px rgba(0,0,0,0.8)';
+                  }
+
+                  if (cfg.glowEnabled && cfg.glowColor) {
+                    textStyle.filter = `drop-shadow(0 0 6px ${cfg.glowColor})`;
+                  }
+
+                  const bgStyle: React.CSSProperties = {};
+                  if (cfg.bgEnabled) {
+                    bgStyle.backgroundColor = cfg.bgColor || '#000000';
+                    bgStyle.opacity = cfg.bgOpacity !== undefined ? cfg.bgOpacity : 0.9;
+                    bgStyle.borderRadius = cfg.shapeStyle === 'pill-badge' ? '999px' : `${Math.min(cfg.bgBorderRadius || 8, 10)}px`;
+                    bgStyle.padding = '4px 10px';
+                    if (cfg.bgBorderColor && (cfg.bgBorderWidth || 0) > 0) {
+                      bgStyle.border = `1.5px solid ${cfg.bgBorderColor}`;
+                    }
+                  }
+
+                  return (
+                    <div
+                      key={tpl.id}
+                      onClick={() => onApplyPreset(tpl.config)}
+                      className="group relative p-2.5 rounded-xl bg-slate-950 border border-slate-800/90 hover:border-indigo-500 cursor-pointer transition-all hover:scale-[1.02] shadow-md flex flex-col justify-between"
+                    >
+                      {/* Realistic Visual Template Preview Box */}
+                      <div className="relative w-full h-20 rounded-lg bg-slate-900 border border-slate-850 mb-2 flex items-center justify-center p-2 overflow-hidden select-none group-hover:border-indigo-500/40 transition-all">
+                        {/* Subtle Grid Background Pattern */}
+                        <div className="absolute inset-0 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:10px_10px] opacity-30 pointer-events-none" />
+
+                        {/* Styled Preset Subtitle Text & Box */}
+                        <div className="relative z-10 flex flex-col items-center justify-center text-center max-w-full px-1" style={bgStyle}>
+                          <div
+                            className="text-xs sm:text-sm font-extrabold tracking-tight truncate max-w-full leading-snug"
+                            style={textStyle}
+                          >
+                            {mainText}
+                          </div>
+                          {subText && (
+                            <div
+                              className="text-[10px] font-semibold tracking-wide truncate max-w-full mt-0.5"
+                              style={{
+                                color: cfg.subFillColor || '#94A3B8',
+                                fontFamily: `"${fontFamily}", sans-serif`,
+                                textShadow: strokeWidth > 0 ? '0 1px 2px rgba(0,0,0,0.9)' : undefined,
+                              }}
+                            >
+                              {subText}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Card Info Footer */}
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-200 group-hover:text-indigo-300 truncate">
+                          {tpl.title}
+                        </h4>
+                        <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
+                          {tpl.description}
+                        </p>
+                      </div>
                     </div>
-                    <h4 className="text-xs font-semibold text-slate-200 group-hover:text-indigo-300">
-                      {tpl.title}
-                    </h4>
-                    <p className="text-[11px] text-slate-400 line-clamp-1 mt-0.5">
-                      {tpl.description}
-                    </p>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <div className="col-span-full py-8 text-center text-slate-400 text-xs">
                   검색 조건에 일치하는 템플릿이 없습니다.
