@@ -278,6 +278,29 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
               />
             </div>
 
+            {/* Dynamic Clock & Stopwatch Control */}
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+              <label className="block text-xs font-semibold text-cyan-400 flex items-center gap-1">
+                <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                ⏰ 실시간 시계 &amp; 초시계(스톱워치) 카운터 모드:
+              </label>
+              <select
+                value={config.clockMode || 'none'}
+                onChange={(e) => updateField('clockMode', e.target.value as any)}
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-cyan-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
+              >
+                <option value="none">❌ 일반 자막 (정적/애니메이션)</option>
+                <option value="realtime-clock">⏱️ 실시간 흐르는 디지털 시계 (지정 시간 ➔ 10초 증가)</option>
+                <option value="stopwatch">⏱️ 60fps 밀리초 초시계/스톱워치 (00:00.00 ➔ 00:10.00)</option>
+                <option value="countdown">⏳ 60fps 카운트다운 타이머 (00:10.00 ➔ 00:00.00)</option>
+              </select>
+              {config.clockMode && config.clockMode !== 'none' && (
+                <p className="text-[11px] text-cyan-300/80 bg-cyan-950/60 p-2 rounded-lg border border-cyan-900/50">
+                  💡 메인 자막의 시간이 실시간 및 비디오 추출(WebM) 시 60fps로 째깍째깍 흘러갑니다!
+                </p>
+              )}
+            </div>
+
             {/* Font Family Selector */}
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">

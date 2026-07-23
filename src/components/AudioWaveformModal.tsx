@@ -131,7 +131,7 @@ export const AudioWaveformModal: React.FC<AudioWaveformModalProps> = ({
       const now = performance.now();
       const elapsed = (now - startTime) / 1000;
 
-      let freqData: Uint8Array | null = null;
+      let freqData: any = null;
       if (analyserRef.current && isPlaying) {
         const bufferLength = analyserRef.current.frequencyBinCount;
         freqData = new Uint8Array(bufferLength);

@@ -134,6 +134,11 @@ export interface SubtitleConfig {
   animationDuration: number; // in seconds
   animationDelay: number;
   animTargetMode?: AnimTargetMode;
+
+  // Dynamic Clock & Stopwatch Counter
+  clockMode?: 'none' | 'realtime-clock' | 'stopwatch' | 'countdown';
+  clockStartSec?: number;
+  clockDurationSec?: number;
 }
 
 export interface PresetTemplate {

@@ -21,6 +21,109 @@ export function getCanvasDimensions(ratio: CanvasRatio): { width: number; height
   }
 }
 
+/**
+ * Dynamically computes ticking digital clock, stopwatch counter, or countdown timer text
+ */
+export function formatDynamicClock(
+  config: SubtitleConfig,
+  mainText: string,
+  progress: number
+): string {
+  const mode = config.clockMode || 'none';
+  if (mode === 'none') return mainText;
+
+  const durationSec = config.clockDurationSec || config.animationDuration || 10;
+  const currentSecDelta = progress * durationSec;
+
+  if (mode === 'realtime-clock') {
+    const timeMatch = mainText.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+    
+    let baseSec = config.clockStartSec !== undefined ? config.clockStartSec : (15 * 3600 + 45 * 60 + 20);
+    let is12Hour = true;
+
+    if (timeMatch) {
+      let hh = parseInt(timeMatch[1], 10);
+      const mm = parseInt(timeMatch[2], 10);
+      const ss = timeMatch[3] ? parseInt(timeMatch[3], 10) : 0;
+      const ampm = timeMatch[4] ? timeMatch[4].toUpperCase() : null;
+
+      if (ampm) {
+        if (ampm === 'PM' && hh < 12) hh += 12;
+        if (ampm === 'AM' && hh === 12) hh = 0;
+        is12Hour = true;
+      } else {
+        is12Hour = false;
+      }
+      baseSec = hh * 3600 + mm * 60 + ss;
+    }
+
+    const totalSec = baseSec + currentSecDelta;
+    let hours = Math.floor(totalSec / 3600) % 24;
+    const mins = Math.floor((totalSec % 3600) / 60);
+    const secs = Math.floor(totalSec % 60);
+
+    let displayPeriod = '';
+    if (is12Hour) {
+      displayPeriod = hours >= 12 ? ' PM' : ' AM';
+      hours = hours % 12;
+      if (hours === 0) hours = 12;
+    }
+
+    const hhStr = String(hours).padStart(2, '0');
+    const mmStr = String(mins).padStart(2, '0');
+    const ssStr = String(secs).padStart(2, '0');
+
+    const formattedTime = timeMatch && !timeMatch[3] 
+      ? `${hhStr}:${mmStr}${displayPeriod}`
+      : `${hhStr}:${mmStr}:${ssStr}${displayPeriod}`;
+
+    if (timeMatch) {
+      return mainText.replace(timeMatch[0], formattedTime);
+    }
+    return `⏱️ ${formattedTime}`;
+  }
+
+  if (mode === 'stopwatch') {
+    const totalSec = currentSecDelta;
+    const mins = Math.floor(totalSec / 60);
+    const secs = Math.floor(totalSec % 60);
+    const ms = Math.floor((totalSec % 1) * 100);
+
+    const mmStr = String(mins).padStart(2, '0');
+    const ssStr = String(secs).padStart(2, '0');
+    const msStr = String(ms).padStart(2, '0');
+
+    const formattedStopwatch = `${mmStr}:${ssStr}.${msStr}`;
+
+    const match = mainText.match(/\d{1,2}:\d{2}(?:\.\d{1,2})?/);
+    if (match) {
+      return mainText.replace(match[0], formattedStopwatch);
+    }
+    return `⏱️ ${formattedStopwatch}`;
+  }
+
+  if (mode === 'countdown') {
+    const remainingSec = Math.max(0, durationSec - currentSecDelta);
+    const mins = Math.floor(remainingSec / 60);
+    const secs = Math.floor(remainingSec % 60);
+    const ms = Math.floor((remainingSec % 1) * 100);
+
+    const mmStr = String(mins).padStart(2, '0');
+    const ssStr = String(secs).padStart(2, '0');
+    const msStr = String(ms).padStart(2, '0');
+
+    const formattedCountdown = `${mmStr}:${ssStr}.${msStr}`;
+
+    const match = mainText.match(/\d{1,2}:\d{2}(?:\.\d{1,2})?/);
+    if (match) {
+      return mainText.replace(match[0], formattedCountdown);
+    }
+    return `⏳ ${formattedCountdown}`;
+  }
+
+  return mainText;
+}
+
 interface AnimState {
   scale: number;
   opacity: number;
@@ -184,7 +287,8 @@ export function renderSubtitleToCanvas(options: RenderOptions) {
     ctx.fillRect(0, 0, width, height);
   }
 
-  const mainText = customMainText !== undefined ? customMainText : config.mainText;
+  const rawMainText = customMainText !== undefined ? customMainText : config.mainText;
+  const mainText = formatDynamicClock(config, rawMainText, progress);
   const subText = customSubText !== undefined ? customSubText : config.subText;
 
   if (!mainText && !subText) return;
