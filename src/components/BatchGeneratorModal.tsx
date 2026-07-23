@@ -19,28 +19,16 @@ export const BatchGeneratorModal: React.FC<BatchGeneratorModalProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState<'text' | 'srt'>('srt');
 
+  const [enableSubtextPairs, setEnableSubtextPairs] = useState<boolean>(true);
+
   // Plain Text State
   const [textInput, setTextInput] = useState<string>(
-    `안녕하세요! 오늘 영상에 와주셔서 감사합니다.\n오늘은 Clipchamp 자막 제작 꿀팁을 소개합니다.\n다양한 예능 자막과 말풍선을 적용해보세요.\n구독과 좋아요는 큰 힘이 됩니다!`
+    `안녕하세요! 오늘 영상에 와주셔서 감사합니다.\nhello! thank you for watching today.\n\n오늘은 Clipchamp 자막 제작 꿀팁을 소개합니다.\nclipchamp subtitle creation tips.\n\n구독과 좋아요는 큰 힘이 됩니다!\nsubscribe & like for more content!`
   );
 
   // SRT State
   const [srtInput, setSrtInput] = useState<string>(
-    `1
-00:00:01,500 --> 00:00:04,200
-안녕하세요! 오늘 영상에 와주셔서 감사합니다.
-
-2
-00:00:04,500 --> 00:00:07,800
-오늘은 Clipchamp 자막 제작 꿀팁을 소개합니다.
-
-3
-00:00:08,000 --> 00:00:11,500
-다양한 예능 자막과 말풍선을 적용해보세요.
-
-4
-00:00:12,000 --> 00:00:15,000
-구독과 좋아요는 큰 힘이 됩니다!`
+    `1\n00:00:01,500 --> 00:00:04,200\n안녕하세요! 오늘 영상에 와주셔서 감사합니다.\n\n2\n00:00:04,500 --> 00:00:07,800\n오늘은 Clipchamp 자막 제작 꿀팁을 소개합니다.\n\n3\n00:00:08,000 --> 00:00:11,500\n다양한 예능 자막과 말풍선을 적용해보세요.\n\n4\n00:00:12,000 --> 00:00:15,000\n구독과 좋아요는 큰 힘이 됩니다!`
   );
 
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -50,6 +38,35 @@ export const BatchGeneratorModal: React.FC<BatchGeneratorModalProps> = ({
   if (!isOpen) return null;
 
   const parsedSrtItems: SRTItem[] = parseSRT(srtInput);
+
+  // Parse Plain Text Lines into Main/Subtext Items
+  const parseTextItems = (input: string, subtextMode: boolean): { mainText: string; subText?: string }[] => {
+    if (!subtextMode) {
+      return input
+        .split('\n')
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0)
+        .map((l) => ({ mainText: l, subText: undefined }));
+    }
+
+    const blocks = input.split(/\n\s*\n/);
+    const items: { mainText: string; subText?: string }[] = [];
+
+    for (const block of blocks) {
+      const lines = block.split('\n').map((l) => l.trim()).filter((l) => l.length > 0);
+      if (lines.length === 0) continue;
+
+      for (let i = 0; i < lines.length; i += 2) {
+        const mainText = lines[i];
+        const subText = lines[i + 1] || undefined;
+        items.push({ mainText, subText });
+      }
+    }
+
+    return items;
+  };
+
+  const parsedTextItems = parseTextItems(textInput, enableSubtextPairs);
 
   // SRT File Upload Handler
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,21 +84,16 @@ export const BatchGeneratorModal: React.FC<BatchGeneratorModalProps> = ({
   };
 
   const handleStartTextBatch = async () => {
-    const lines = textInput
-      .split('\n')
-      .map((l) => l.trim())
-      .filter((l) => l.length > 0);
-
-    if (lines.length === 0) {
+    if (parsedTextItems.length === 0) {
       alert('일괄 처리할 대사를 1줄 이상 입력해 주세요.');
       return;
     }
 
     setIsProcessing(true);
-    setProgress({ current: 0, total: lines.length });
+    setProgress({ current: 0, total: parsedTextItems.length });
 
     try {
-      await exportBatchAsZip(lines, config, ratio, (current, total) => {
+      await exportBatchAsZip(parsedTextItems, config, ratio, (current, total) => {
         setProgress({ current, total });
       });
       setIsProcessing(false);
@@ -274,24 +286,75 @@ export const BatchGeneratorModal: React.FC<BatchGeneratorModalProps> = ({
 
           {/* TAB 2: Plain Text Lines */}
           {activeTab === 'text' && (
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                자막 대사 목록 (줄바꿈으로 구분)
-              </label>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="subtextToggle"
+                    checked={enableSubtextPairs}
+                    onChange={(e) => setEnableSubtextPairs(e.target.checked)}
+                    className="w-4 h-4 accent-amber-500 rounded cursor-pointer"
+                  />
+                  <label htmlFor="subtextToggle" className="text-xs font-bold text-amber-300 cursor-pointer">
+                    🔤 서브 자막 자동 감지 (2줄 1쌍 모드)
+                  </label>
+                </div>
+                <span className="text-[11px] text-slate-400">
+                  {enableSubtextPairs ? '윗줄: 메인 자막 / 아랫줄: 서브 자막' : '1줄당 1개 메인 자막'}
+                </span>
+              </div>
+
               <textarea
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
-                rows={8}
+                rows={6}
                 disabled={isProcessing}
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-xs font-sans text-slate-100 focus:outline-none focus:border-amber-500 leading-relaxed custom-scrollbar disabled:opacity-50"
-                placeholder="자막 대사를 한 줄씩 입력하세요..."
+                placeholder={
+                  enableSubtextPairs
+                    ? "윗줄에 메인 자막, 아랫줄에 서브 자막을 입력하세요:\n\n안녕하세요?\nhello?\n\n오늘 날씨가 정말 좋네요!\nIt's a really nice day today!"
+                    : "자막 대사를 한 줄씩 입력하세요..."
+                }
               />
-              <p className="text-[11px] text-slate-400 mt-1 flex justify-between">
-                <span>* 각 줄별로 transparent PNG 자막 파일이 생성됩니다.</span>
-                <span className="font-mono text-amber-400 font-semibold">
-                  총 {textInput.split('\n').filter((l) => l.trim()).length}개 대사
-                </span>
-              </p>
+
+              {/* Parsed Plain Text Preview */}
+              <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2">
+                <div className="flex items-center justify-between text-xs font-semibold text-slate-300 border-b border-slate-800 pb-2">
+                  <span className="flex items-center gap-1.5 text-amber-400">
+                    <CheckCircle2 className="w-4 h-4" />
+                    생성될 자막 구성 미리보기
+                  </span>
+                  <span className="font-mono text-amber-400 font-bold">
+                    총 {parsedTextItems.length}개 자막 세트
+                  </span>
+                </div>
+
+                <div className="max-h-36 overflow-y-auto space-y-1.5 custom-scrollbar pr-1">
+                  {parsedTextItems.length > 0 ? (
+                    parsedTextItems.map((item, idx) => (
+                      <div
+                        key={idx}
+                        className="flex flex-col bg-slate-900/80 px-3 py-1.5 rounded-lg text-xs border border-slate-800/80 gap-0.5"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-mono text-amber-400 font-bold text-[11px]">#{idx + 1}</span>
+                          <span className="text-slate-100 font-bold">{item.mainText}</span>
+                        </div>
+                        {item.subText && (
+                          <div className="text-[11px] text-indigo-300 pl-5 italic">
+                            ↳ 서브자막: {item.subText}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-500 italic py-2 text-center">
+                      대사를 입력해 주세요.
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 

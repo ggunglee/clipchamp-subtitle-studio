@@ -197,11 +197,16 @@ export async function exportSRTAsSingleWebMVideo(
   });
 }
 
+export interface BatchTextItem {
+  mainText: string;
+  subText?: string;
+}
+
 /**
- * Batch exports multiple text lines into a single ZIP archive containing transparent PNGs
+ * Batch exports transparent PNGs into a ZIP file for each text line / pair
  */
 export async function exportBatchAsZip(
-  textLines: string[],
+  textItems: (string | BatchTextItem)[],
   config: SubtitleConfig,
   ratio: CanvasRatio,
   onProgress?: (current: number, total: number) => void
@@ -214,16 +219,20 @@ export async function exportBatchAsZip(
   tempCanvas.width = width;
   tempCanvas.height = height;
 
-  for (let i = 0; i < textLines.length; i++) {
-    const line = textLines[i].trim();
-    if (!line) continue;
+  for (let i = 0; i < textItems.length; i++) {
+    const raw = textItems[i];
+    const mainText = typeof raw === 'string' ? raw.trim() : raw.mainText.trim();
+    const subText = typeof raw === 'string' ? undefined : raw.subText?.trim();
+
+    if (!mainText && !subText) continue;
 
     renderSubtitleToCanvas({
       canvas: tempCanvas,
       config,
       ratio,
       progress: 1.0,
-      customMainText: line,
+      customMainText: mainText,
+      customSubText: subText,
       transparentBackground: true,
     });
 
@@ -234,7 +243,7 @@ export async function exportBatchAsZip(
     folder.file(fileName, base64Data, { base64: true });
 
     if (onProgress) {
-      onProgress(i + 1, textLines.length);
+      onProgress(i + 1, textItems.length);
     }
   }
 
