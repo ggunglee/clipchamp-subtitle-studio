@@ -2,6 +2,7 @@ import JSZip from 'jszip';
 import { SubtitleConfig, CanvasRatio } from '../types/subtitle';
 import { renderSubtitleToCanvas, getCanvasDimensions } from './canvasRenderer';
 import { SRTItem } from './srtParser';
+import { sfx, SFXType } from './sfxManager';
 
 /**
  * Renders current canvas state to high-res transparent PNG Data URL
@@ -57,9 +58,19 @@ export async function exportAsWebMVideo(
   const totalFrames = Math.round(fps * config.animationDuration);
   const stream = tempCanvas.captureStream(fps);
 
-  let options: MediaRecorderOptions = { mimeType: 'video/webm;codecs=vp9' };
+  // Web Audio Context & Destination Node for Recording Audio Track
+  const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+  const exportAudioCtx = new AudioCtx();
+  const audioDest = exportAudioCtx.createMediaStreamDestination();
+
+  if (audioDest.stream.getAudioTracks().length > 0 && !sfx.getMuted()) {
+    const audioTrack = audioDest.stream.getAudioTracks()[0];
+    stream.addTrack(audioTrack);
+  }
+
+  let options: MediaRecorderOptions = { mimeType: 'video/webm;codecs=vp9,opus' };
   if (!MediaRecorder.isTypeSupported(options.mimeType!)) {
-    options = { mimeType: 'video/webm;codecs=vp8' };
+    options = { mimeType: 'video/webm;codecs=vp8,opus' };
   }
   if (!MediaRecorder.isTypeSupported(options.mimeType!)) {
     options = { mimeType: 'video/webm' };
@@ -74,11 +85,40 @@ export async function exportAsWebMVideo(
 
   return new Promise((resolve, reject) => {
     mediaRecorder.onstop = () => {
+      exportAudioCtx.close();
       const blob = new Blob(chunks, { type: 'video/webm' });
       resolve(blob);
     };
 
-    mediaRecorder.onerror = (err) => reject(err);
+    mediaRecorder.onerror = (err) => {
+      exportAudioCtx.close();
+      reject(err);
+    };
+
+    // Trigger SFX directly into Recording Audio Destination
+    if (!sfx.getMuted() && config.sfxType !== 'none') {
+      if (config.animation === 'typewriter' || config.sfxType === 'click') {
+        const textToType = config.mainText || '오늘의 하이라이트!';
+        const durationSec = config.animationDuration || 1.5;
+        sfx.playTypewriterSequence(textToType, durationSec, exportAudioCtx, audioDest);
+      } else {
+        let sfxType: SFXType = config.sfxType && config.sfxType !== 'auto' ? config.sfxType : 'pop';
+        if (config.sfxType === 'auto' || !config.sfxType) {
+          if (config.category === 'corner') sfxType = 'ding';
+          else if (
+            config.animation === 'slide-up' ||
+            config.animation === 'slide-left' ||
+            config.animation === 'slide-down' ||
+            config.animation === 'slide-right' ||
+            config.animation === 'rise-up'
+          )
+            sfxType = 'whoosh';
+          else if (config.animation === 'glitch' || config.animation === 'neon-pulse') sfxType = 'glitch';
+          else if (config.clockMode === 'realtime-clock' || config.clockMode === 'stopwatch') sfxType = 'tick';
+        }
+        sfx.play(sfxType, exportAudioCtx, audioDest);
+      }
+    }
 
     mediaRecorder.start();
 
