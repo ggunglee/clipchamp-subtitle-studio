@@ -53,6 +53,71 @@ class SFXEngine {
   }
 
   /**
+   * Plays a rapid sequential mechanical typewriter key click typing sequence (탁-탁-탁-탁-탁!)
+   * matching text length and animation duration.
+   */
+  public playTypewriterSequence(charCount: number, durationSec: number, customCtx?: AudioContext, targetNode?: AudioNode) {
+    if (this.isMuted && !customCtx) return;
+
+    try {
+      const ctx = customCtx || this.getContext();
+      const now = ctx.currentTime;
+      const dest = targetNode || ctx.destination;
+
+      const validCharCount = Math.max(1, Math.min(charCount, 50));
+      const interval = Math.max(0.045, (durationSec * 0.85) / validCharCount);
+
+      for (let i = 0; i < validCharCount; i++) {
+        const clickTime = now + i * interval;
+        const randomPitchOffset = (Math.random() - 0.5) * 400;
+        const keyFreq = 3000 + randomPitchOffset;
+
+        const bufferSize = Math.floor(ctx.sampleRate * 0.015);
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const noiseData = noiseBuffer.getChannelData(0);
+        for (let k = 0; k < bufferSize; k++) {
+          noiseData[k] = (Math.random() * 2 - 1) * Math.exp(-k / (ctx.sampleRate * 0.0025));
+        }
+
+        const noise = ctx.createBufferSource();
+        noise.buffer = noiseBuffer;
+
+        const filter = ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(2400 + randomPitchOffset * 0.5, clickTime);
+
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.3, clickTime);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, clickTime + 0.018);
+
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(dest);
+
+        const osc = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(keyFreq, clickTime);
+        osc.frequency.exponentialRampToValueAtTime(800, clickTime + 0.015);
+
+        oscGain.gain.setValueAtTime(0.18, clickTime);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, clickTime + 0.018);
+
+        osc.connect(oscGain);
+        oscGain.connect(dest);
+
+        noise.start(clickTime);
+        osc.start(clickTime);
+        noise.stop(clickTime + 0.02);
+        osc.stop(clickTime + 0.02);
+      }
+    } catch (err) {
+      console.warn('Typewriter sequence playback error:', err);
+    }
+  }
+
+  /**
    * Plays a YouTube editing sound effect
    */
   public play(type: SFXType, customCtx?: AudioContext, targetNode?: AudioNode) {

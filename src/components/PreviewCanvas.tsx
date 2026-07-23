@@ -75,6 +75,14 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
 
   const playMatchingSFX = () => {
     if (config.sfxType === 'none') return;
+
+    if (config.animation === 'typewriter' || config.sfxType === 'click') {
+      const charCount = (config.mainText || '').length || 8;
+      const durationSec = config.animationDuration || 1.5;
+      sfx.playTypewriterSequence(charCount, durationSec);
+      return;
+    }
+
     if (config.sfxType && config.sfxType !== 'auto') {
       sfx.play(config.sfxType);
       return;
@@ -92,7 +100,6 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
     )
       sfxType = 'whoosh';
     else if (config.animation === 'glitch' || config.animation === 'neon-pulse') sfxType = 'glitch';
-    else if (config.animation === 'typewriter') sfxType = 'click';
     else if (config.clockMode === 'realtime-clock' || config.clockMode === 'stopwatch') sfxType = 'tick';
 
     sfx.play(sfxType);
