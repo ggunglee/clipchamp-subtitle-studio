@@ -432,6 +432,26 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
               />
             </div>
 
+            {/* Badge Text (For Header Cards & Badges) */}
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-amber-300 flex items-center gap-1">
+                  🏷️ 포인트/헤더 뱃지 텍스트 (Badge Text):
+                </label>
+                <span className="text-[10px] text-slate-400">셜록/뱃지 카드 전용</span>
+              </div>
+              <input
+                type="text"
+                value={config.badgeText !== undefined ? config.badgeText : '!'}
+                onChange={(e) => updateField('badgeText', e.target.value)}
+                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-amber-200 focus:outline-none focus:border-amber-500"
+                placeholder="예: MIT, Point.2, NEWS, LIVE, Q, 속보, !"
+              />
+              <p className="text-[10px] text-slate-400">
+                💡 셜록/다큐 헤더 카드 등 좌측 뱃지 박스에 표시되는 텍스트를 마음대로 입력하세요!
+              </p>
+            </div>
+
             {/* Dynamic Clock & Stopwatch Control */}
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
               <label className="block text-xs font-semibold text-cyan-400 flex items-center gap-1">

@@ -307,7 +307,7 @@ export const PRESET_TEMPLATES: PresetTemplate[] = [
       subFontSize: 24,
       fillType: 'solid',
       fillColor1: '#FFFFFF',
-      subFillColor: '#1C1917',
+      subFillColor: '#FDF6E2',
       strokeEnabled: false,
       secondStrokeEnabled: false,
       shadowEnabled: true,

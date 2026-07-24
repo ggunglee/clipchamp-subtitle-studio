@@ -408,7 +408,12 @@ export function renderSubtitleToCanvas(options: RenderOptions) {
       ctx.stroke();
     } else if (config.shapeStyle === 'tag-header-card') {
       // Sherlock/Docu Header Badge Box attached at top-left
-      const badgeW = Math.max(48, fontSize * 1.2);
+      const badgeText = config.badgeText !== undefined ? config.badgeText : '!';
+      const badgeFontSize = badgeText.length > 3 ? Math.max(16, fontSize * 0.48) : Math.max(20, fontSize * 0.72);
+
+      ctx.font = `900 ${badgeFontSize}px "Black Han Sans", sans-serif`;
+      const measuredBadgeWidth = ctx.measureText(badgeText).width;
+      const badgeW = Math.max(52, measuredBadgeWidth + 28);
       const badgeH = boxH;
       const badgeX = boxX - badgeW + 8;
 
@@ -416,10 +421,14 @@ export function renderSubtitleToCanvas(options: RenderOptions) {
       drawRoundedRect(ctx, badgeX, boxY, badgeW, badgeH, 6);
       ctx.fill();
 
-      // Render Badge Icon/Text inside header box (e.g. "!")
-      const badgeText = config.badgeText !== undefined ? config.badgeText : '!';
+      if (config.bgBorderWidth > 0) {
+        ctx.strokeStyle = config.bgBorderColor;
+        ctx.lineWidth = config.bgBorderWidth;
+        ctx.stroke();
+      }
+
+      // Render Badge Icon/Text inside header box (e.g. "!", "MIT", "Point.2", "NEWS")
       ctx.fillStyle = config.badgeTextColor || '#FF5533';
-      ctx.font = `900 ${fontSize * 0.9}px "Black Han Sans", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(badgeText, badgeX + badgeW / 2, boxY + badgeH / 2);
@@ -448,11 +457,11 @@ export function renderSubtitleToCanvas(options: RenderOptions) {
   // Glow
   if (config.glowEnabled) {
     ctx.shadowColor = config.glowColor;
-    ctx.shadowBlur = config.glowBlur * textAnim.glowMult;
+    ctx.shadowBlur = config.glowBlur;
   }
 
-  // Shadow
-  if (config.shadowEnabled) {
+  // Drop Shadow (for text)
+  if (config.shadowEnabled && !config.bgEnabled) {
     ctx.shadowColor = config.shadowColor;
     ctx.shadowBlur = config.shadowBlur;
     ctx.shadowOffsetX = config.shadowOffsetX;
@@ -500,7 +509,7 @@ export function renderSubtitleToCanvas(options: RenderOptions) {
 
     if (config.strokeEnabled && config.strokeWidth > 0) {
       ctx.strokeStyle = config.strokeColor;
-      ctx.lineWidth = (config.strokeWidth * 0.6) * (width / 1920);
+      ctx.lineWidth = Math.min(2.5, config.strokeWidth * 0.3) * (width / 1920);
       ctx.lineJoin = 'round';
       ctx.strokeText(textAnim.displayedSubText, 0, subY);
     }
