@@ -338,7 +338,7 @@ export function renderSubtitleToCanvas(options: RenderOptions) {
   const subFontSize = config.subFontSize * (width / 1920);
 
   const mainFontStr = `${config.fontWeight} ${fontSize}px "${config.fontFamily}", sans-serif`;
-  const subFontStr = `600 ${subFontSize}px "${config.fontFamily}", sans-serif`;
+  const subFontStr = `${config.subFontWeight || '600'} ${subFontSize}px "${config.fontFamily}", sans-serif`;
 
   ctx.save();
   ctx.font = mainFontStr;

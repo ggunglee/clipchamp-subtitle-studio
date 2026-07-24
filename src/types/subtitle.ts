@@ -82,6 +82,7 @@ export interface SubtitleConfig {
   fontSize: number; // in px on 1080p canvas
   subFontSize: number;
   fontWeight: string;
+  subFontWeight?: string;
   letterSpacing: number; // in px
   lineHeight: number;
   textAlign: 'left' | 'center' | 'right';

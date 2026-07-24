@@ -504,10 +504,10 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
               </div>
             </div>
 
-            {/* Font Weight */}
+            {/* Main Font Weight */}
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1">
-                폰트 굵기 (Font Weight: {config.fontWeight})
+                메인 자막 폰트 굵기 (Font Weight: {config.fontWeight})
               </label>
               <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-7">
                 {[
@@ -521,9 +521,41 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                 ].map((item) => (
                   <button
                     key={item.w}
+                    type="button"
                     onClick={() => updateField('fontWeight', item.w)}
                     className={`py-1.5 px-1 rounded-lg text-[11px] font-semibold border text-center transition-all ${
                       config.fontWeight === item.w
+                        ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
+                        : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Subtext Font Weight */}
+            <div>
+              <label className="block text-xs font-semibold text-indigo-300 mb-1">
+                서브 자막 폰트 굵기 (Subtext Weight: {config.subFontWeight || '600'})
+              </label>
+              <div className="grid grid-cols-4 gap-1.5 sm:grid-cols-7">
+                {[
+                  { w: '100', label: '초슬림 100' },
+                  { w: '200', label: '아주얇게 200' },
+                  { w: '300', label: '얇게 300' },
+                  { w: '400', label: '보통 400' },
+                  { w: '600', label: '중간 600' },
+                  { w: '700', label: '볼드 700' },
+                  { w: '900', label: '울트라 900' },
+                ].map((item) => (
+                  <button
+                    key={item.w}
+                    type="button"
+                    onClick={() => updateField('subFontWeight', item.w)}
+                    className={`py-1.5 px-1 rounded-lg text-[11px] font-semibold border text-center transition-all ${
+                      (config.subFontWeight || '600') === item.w
                         ? 'bg-indigo-600 text-white border-indigo-500 shadow-sm'
                         : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200'
                     }`}

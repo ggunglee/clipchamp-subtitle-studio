@@ -10,6 +10,7 @@ export const DEFAULT_SUBTITLE_CONFIG: SubtitleConfig = {
   fontSize: 72,
   subFontSize: 28,
   fontWeight: '900',
+  subFontWeight: '600',
   letterSpacing: 2,
   lineHeight: 1.2,
   textAlign: 'center',
