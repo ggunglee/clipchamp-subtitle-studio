@@ -77,6 +77,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
           ? favoriteIds.includes(tpl.id)
           : selectedCategory === 'all' || 
             tpl.category === selectedCategory ||
+            (selectedCategory === 'sherlock' && (tpl.category === 'sherlock' || tpl.themeVibe === 'sherlock-docu')) ||
             (selectedCategory === 'youtube' && (tpl.category === 'youtube' || tpl.category === 'badge')) ||
             (selectedCategory === 'shorts' && (tpl.category === 'shorts' || tpl.category === 'youtube')) ||
             (selectedCategory === 'vlog' && tpl.category === 'vlog') ||
@@ -221,6 +222,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                 >
                   <option value="all">🌟 전체 영상 용도 (All Uses)</option>
                   <option value="favorites">⭐ 즐겨찾기 보관함 ({favoriteIds.length})</option>
+                  <option value="sherlock">🏛️ 셜록현준 무드 (Sherlock Hyunjun Style)</option>
                   <option value="speech">🗣️ 말자막 (대사 / 말풍선 / 하단 자막)</option>
                   <option value="corner">📌 좌상단 / 우상단 코너 뱃지 (위치 & 라벨)</option>
                   <option value="youtube">🎬 유튜브 예능</option>

@@ -1,6 +1,7 @@
 export type CanvasRatio = '16:9' | '9:16' | '1:1';
 
 export type SubtitleCategory = 
+  | 'sherlock'
   | 'youtube' 
   | 'shorts'
   | 'vlog'
