@@ -13,7 +13,8 @@ import {
   Clock,
   Search,
   Filter,
-  Volume2
+  Volume2,
+  Star
 } from 'lucide-react';
 import { SubtitleConfig, AnimationType, AnimTargetMode, SubtitleCategory } from '../types/subtitle';
 import { PRESET_TEMPLATES, GOOGLE_FONTS_LIST, DEFAULT_SUBTITLE_CONFIG } from '../constants/templates';
@@ -37,6 +38,29 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
   const [selectedThemeVibe, setSelectedThemeVibe] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  // Favorited Templates State with LocalStorage Persistence
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('subtitle_studio_favorite_templates');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const toggleFavorite = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFavoriteIds((prev) => {
+      const next = prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id];
+      try {
+        localStorage.setItem('subtitle_studio_favorite_templates', JSON.stringify(next));
+      } catch (err) {
+        console.warn(err);
+      }
+      return next;
+    });
+  };
+
   const updateField = <K extends keyof SubtitleConfig>(key: K, value: SubtitleConfig[K]) => {
     onChangeConfig({
       ...config,
@@ -44,20 +68,23 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
     });
   };
 
-  // Filter templates based on Category, Mood Vibe, and Search Query
+  // Filter templates based on Category, Mood Vibe, Search Query, and Favorites
   const filteredTemplates = useMemo(() => {
     return PRESET_TEMPLATES.filter((tpl) => {
+      const isFavMode = selectedCategory === 'favorites';
       const matchesCategory = 
-        selectedCategory === 'all' || 
-        tpl.category === selectedCategory ||
-        (selectedCategory === 'youtube' && (tpl.category === 'youtube' || tpl.category === 'badge')) ||
-        (selectedCategory === 'shorts' && (tpl.category === 'shorts' || tpl.category === 'youtube')) ||
-        (selectedCategory === 'vlog' && tpl.category === 'vlog') ||
-        (selectedCategory === 'speech' && (tpl.category === 'speech' || tpl.category === 'caption-box')) ||
-        (selectedCategory === 'corner' && (tpl.category === 'corner' || tpl.category === 'badge')) ||
-        (selectedCategory === 'news' && (tpl.category === 'news' || tpl.category === 'info-news')) ||
-        (selectedCategory === 'cinematic' && (tpl.category === 'cinematic' || tpl.category === 'cinema')) ||
-        (selectedCategory === 'gaming' && (tpl.category === 'gaming' || tpl.category === 'neon'));
+        isFavMode
+          ? favoriteIds.includes(tpl.id)
+          : selectedCategory === 'all' || 
+            tpl.category === selectedCategory ||
+            (selectedCategory === 'youtube' && (tpl.category === 'youtube' || tpl.category === 'badge')) ||
+            (selectedCategory === 'shorts' && (tpl.category === 'shorts' || tpl.category === 'youtube')) ||
+            (selectedCategory === 'vlog' && tpl.category === 'vlog') ||
+            (selectedCategory === 'speech' && (tpl.category === 'speech' || tpl.category === 'caption-box')) ||
+            (selectedCategory === 'corner' && (tpl.category === 'corner' || tpl.category === 'badge')) ||
+            (selectedCategory === 'news' && (tpl.category === 'news' || tpl.category === 'info-news')) ||
+            (selectedCategory === 'cinematic' && (tpl.category === 'cinematic' || tpl.category === 'cinema')) ||
+            (selectedCategory === 'gaming' && (tpl.category === 'gaming' || tpl.category === 'neon'));
 
       const matchesVibe = 
         selectedThemeVibe === 'all' ||
@@ -73,7 +100,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
 
       return matchesCategory && matchesVibe && matchesSearch;
     });
-  }, [selectedCategory, selectedThemeVibe, searchQuery]);
+  }, [selectedCategory, selectedThemeVibe, searchQuery, favoriteIds]);
 
   return (
     <div className="w-full bg-slate-900/90 backdrop-blur border border-slate-800 rounded-2xl overflow-hidden flex flex-col h-[750px] max-h-[85vh] shadow-xl">
@@ -193,6 +220,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-indigo-300 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm"
                 >
                   <option value="all">🌟 전체 영상 용도 (All Uses)</option>
+                  <option value="favorites">⭐ 즐겨찾기 보관함 ({favoriteIds.length})</option>
                   <option value="speech">🗣️ 말자막 (대사 / 말풍선 / 하단 자막)</option>
                   <option value="corner">📌 좌상단 / 우상단 코너 뱃지 (위치 & 라벨)</option>
                   <option value="youtube">🎬 유튜브 예능</option>
@@ -229,6 +257,7 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filteredTemplates.length > 0 ? (
                 filteredTemplates.map((tpl) => {
+                  const isFav = favoriteIds.includes(tpl.id);
                   const cfg = tpl.config;
                   const rawMainText = cfg.mainText || tpl.title;
                   // Truncate to 5-6 key characters for maximum readability & big text size
@@ -297,6 +326,20 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                     >
                       {/* High Contrast Visual Template Preview Box */}
                       <div className="relative w-full h-22 rounded-xl bg-slate-900/90 border border-slate-800 mb-2 flex items-center justify-center p-2 overflow-hidden select-none group-hover:border-indigo-500/50 transition-all shadow-inner">
+                        {/* Favorite Star Toggle Button */}
+                        <button
+                          type="button"
+                          onClick={(e) => toggleFavorite(tpl.id, e)}
+                          className="absolute top-1.5 right-1.5 p-1 rounded-lg bg-slate-950/85 hover:bg-slate-900 border border-slate-700/80 z-20 transition-all hover:scale-110 active:scale-125 shadow-sm"
+                          title={isFav ? '즐겨찾기 해제' : '즐겨찾기에 추가'}
+                        >
+                          <Star
+                            className={`w-3.5 h-3.5 ${
+                              isFav ? 'fill-amber-400 text-amber-400' : 'text-slate-400 hover:text-amber-300'
+                            }`}
+                          />
+                        </button>
+
                         {/* High Contrast Neutral Grid Pattern Background */}
                         <div className="absolute inset-0 bg-[radial-gradient(#475569_1.2px,transparent_1.2px)] [background-size:10px_10px] opacity-40 pointer-events-none" />
 
@@ -335,6 +378,14 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                     </div>
                   );
                 })
+              ) : selectedCategory === 'favorites' ? (
+                <div className="col-span-full py-10 text-center bg-slate-950/70 rounded-2xl border border-dashed border-slate-800 p-6">
+                  <Star className="w-8 h-8 text-amber-400/50 mx-auto mb-2 animate-pulse" />
+                  <p className="text-xs font-bold text-slate-200">즐겨찾기한 템플릿이 없습니다</p>
+                  <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                    템플릿 카드의 별(⭐) 아이콘을 클릭하여 자주 사용하는 자막 디자인을 등록해보세요!
+                  </p>
+                </div>
               ) : (
                 <div className="col-span-full py-8 text-center text-slate-400 text-xs">
                   검색 조건에 일치하는 템플릿이 없습니다.
