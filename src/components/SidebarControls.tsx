@@ -670,6 +670,19 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
               )}
             </div>
 
+            {/* Subtext Fill Color */}
+            <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-indigo-300">서브 자막 글자 색상 (Subtext Color)</span>
+                <input
+                  type="color"
+                  value={config.subFillColor || '#94A3B8'}
+                  onChange={(e) => updateField('subFillColor', e.target.value)}
+                  className="w-6 h-6 rounded cursor-pointer bg-transparent border-0"
+                />
+              </div>
+            </div>
+
             {/* Stroke 1 (Primary Outline) */}
             <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
               <div className="flex items-center justify-between">
@@ -886,26 +899,95 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                       />
                     </div>
                   </div>
+
+                  <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-slate-400">배경 테두리 외곽선 ({config.bgBorderWidth || 0}px)</span>
+                      <input
+                        type="color"
+                        value={config.bgBorderColor || '#FFD700'}
+                        onChange={(e) => updateField('bgBorderColor', e.target.value)}
+                        className="w-6 h-6 rounded cursor-pointer bg-transparent border-0"
+                      />
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={15}
+                      value={config.bgBorderWidth || 0}
+                      onChange={(e) => updateField('bgBorderWidth', parseInt(e.target.value))}
+                      className="w-full accent-indigo-500"
+                    />
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* Special Shapes: Lower-third, Speech Bubble, Pill Badge */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                특수 디자인 모양 (Special Shapes)
-              </label>
-              <select
-                value={config.shapeStyle}
-                onChange={(e) => updateField('shapeStyle', e.target.value as any)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
-              >
-                <option value="none">없음 (기본)</option>
-                <option value="lower-third-bar">방송 하단 세로 포인트바 (Lower Third Bar)</option>
-                <option value="speech-bubble-tail">웹툰 대사 말풍선 꼬리 (Speech Bubble Tail)</option>
-                <option value="pill-badge">쇼츠/인스타 알림 알약 뱃지 (Pill Badge)</option>
-                <option value="double-line">시네마틱 상하 더블 라인 (Double Line)</option>
-              </select>
+            {/* Special Shapes: Lower-third, Speech Bubble, Pill Badge, Sherlock Tag */}
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  특수 디자인 모양 (Special Shapes)
+                </label>
+                <select
+                  value={config.shapeStyle}
+                  onChange={(e) => updateField('shapeStyle', e.target.value as any)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-xs text-slate-100 focus:outline-none focus:border-indigo-500"
+                >
+                  <option value="none">없음 (기본)</option>
+                  <option value="tag-header-card">🏷️ 셜록 / 다큐 좌측 포인트 헤더 카드 & 뱃지 (Header Badge Card)</option>
+                  <option value="lower-third-bar">📺 방송 하단 세로 포인트바 (Lower Third Bar)</option>
+                  <option value="speech-bubble-tail">💬 웹툰 대사 말풍선 꼬리 (Speech Bubble Tail)</option>
+                  <option value="pill-badge">💊 쇼츠/인스타 알림 알약 뱃지 (Pill Badge)</option>
+                  <option value="double-line">🎬 시네마틱 상하 더블 라인 (Double Line)</option>
+                  <option value="tilted-paper">📜 액센트 테두리 라인 (Border Accent Line)</option>
+                </select>
+              </div>
+
+              {config.shapeStyle !== 'none' && (
+                <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-amber-300">🎨 포인트 액센트 블록/라인 색상</span>
+                    <input
+                      type="color"
+                      value={config.shapeAccentColor || '#0F3B2E'}
+                      onChange={(e) => updateField('shapeAccentColor', e.target.value)}
+                      className="w-7 h-7 rounded cursor-pointer bg-transparent border-0"
+                    />
+                  </div>
+
+                  {config.shapeStyle === 'tag-header-card' && (
+                    <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800/80">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          뱃지 기호/문구
+                        </label>
+                        <input
+                          type="text"
+                          value={config.badgeText !== undefined ? config.badgeText : '!'}
+                          onChange={(e) => updateField('badgeText', e.target.value)}
+                          placeholder="!, NEWS, Q, LIVE 등"
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2 py-1 text-xs text-slate-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 mb-1">
+                          뱃지 문구 색상
+                        </label>
+                        <div className="flex items-center gap-2 bg-slate-900 p-1 rounded-lg border border-slate-800">
+                          <input
+                            type="color"
+                            value={config.badgeTextColor || '#FF5533'}
+                            onChange={(e) => updateField('badgeTextColor', e.target.value)}
+                            className="w-6 h-6 rounded cursor-pointer bg-transparent border-0"
+                          />
+                          <span className="text-[10px] font-mono text-slate-300">{config.badgeTextColor || '#FF5533'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {config.shapeStyle === 'speech-bubble-tail' && (

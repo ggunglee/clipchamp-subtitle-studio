@@ -417,8 +417,8 @@ export function renderSubtitleToCanvas(options: RenderOptions) {
       ctx.fill();
 
       // Render Badge Icon/Text inside header box (e.g. "!")
-      const badgeText = config.badgeText || '!';
-      ctx.fillStyle = '#FF5533';
+      const badgeText = config.badgeText !== undefined ? config.badgeText : '!';
+      ctx.fillStyle = config.badgeTextColor || '#FF5533';
       ctx.font = `900 ${fontSize * 0.9}px "Black Han Sans", sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';

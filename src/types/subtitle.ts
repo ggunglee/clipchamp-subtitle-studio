@@ -123,6 +123,7 @@ export interface SubtitleConfig {
   // Shape Decors & Lower Thirds
   shapeStyle: ShapeStyle;
   shapeAccentColor: string;
+  badgeTextColor?: string;
   tailPosition?: 'bottom-left' | 'bottom-center' | 'bottom-right';
 
   // Position & Alignment (Percentage 0-100 relative to canvas)
