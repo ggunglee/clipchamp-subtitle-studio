@@ -21,6 +21,11 @@ export type SubtitleCategory =
 export type ThemeVibe = 
   | 'all'
   | 'sherlock-docu'
+  | 'sherlock-teal'
+  | 'sherlock-burgundy'
+  | 'sherlock-blue'
+  | 'sherlock-charcoal'
+  | 'sherlock-cacao'
   | 'bold-fire'
   | 'cute-pop'
   | 'aesthetic-chill'

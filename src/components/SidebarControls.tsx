@@ -245,7 +245,11 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
                   className="w-full bg-slate-950 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-amber-300 focus:outline-none focus:border-amber-500 cursor-pointer shadow-sm"
                 >
                   <option value="all">🌟 전체 디자인 스타일 (All Styles)</option>
-                  <option value="sherlock-docu">🕵️ 셜록 / 딥그린 종이 질감</option>
+                  <option value="sherlock-teal">🌲 셜록: 딥 포레스트 틸 (Forest Teal)</option>
+                  <option value="sherlock-burgundy">🍷 셜록: 딥 버건디 레드 (Burgundy Red)</option>
+                  <option value="sherlock-blue">💙 셜록: 미드나잇 딥 블루 (Midnight Blue)</option>
+                  <option value="sherlock-charcoal">🖤 셜록: 다크 차콜 블랙 (Dark Charcoal)</option>
+                  <option value="sherlock-cacao">☕ 셜록: 빈티지 우드 카카오 (Wood Cacao)</option>
                   <option value="bold-fire">🔥 강렬 3D / 네온 파워</option>
                   <option value="cute-pop">✨ 큐트 파스텔 / 팝</option>
                   <option value="aesthetic-chill">🌿 감성 모던 / 미니멀</option>
