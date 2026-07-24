@@ -55,7 +55,9 @@ export async function exportAsWebMVideo(
   tempCanvas.height = height;
 
   const fps = 60;
-  const durationSec = Math.max(0.5, config.animationDuration || 1.5);
+  const animDur = Math.max(0.3, config.animationDuration || 1.0);
+  const holdDur = config.holdDuration !== undefined ? config.holdDuration : 1.5;
+  const totalDurationSec = animDur + holdDur;
   const stream = tempCanvas.captureStream(fps);
 
   // Web Audio Context & Destination Node for Recording Audio Track
@@ -105,7 +107,7 @@ export async function exportAsWebMVideo(
     if (!sfx.getMuted() && config.sfxType !== 'none') {
       if (config.animation === 'typewriter' || config.sfxType === 'click') {
         const textToType = config.mainText || '오늘의 하이라이트!';
-        sfx.playTypewriterSequence(textToType, durationSec, exportAudioCtx, audioDest);
+        sfx.playTypewriterSequence(textToType, animDur, exportAudioCtx, audioDest);
       } else {
         let sfxType: SFXType = config.sfxType && config.sfxType !== 'auto' ? config.sfxType : 'pop';
         if (config.sfxType === 'auto' || !config.sfxType) {
@@ -129,21 +131,22 @@ export async function exportAsWebMVideo(
 
     const recordLoop = (timestamp: number) => {
       const elapsedSec = (timestamp - startTime) / 1000;
-      const progress = Math.min(1.0, elapsedSec / durationSec);
+      const overallProgress = Math.min(1.0, elapsedSec / totalDurationSec);
+      const animProgress = Math.min(1.0, elapsedSec / animDur);
 
       renderSubtitleToCanvas({
         canvas: tempCanvas,
         config,
         ratio,
-        progress,
+        progress: animProgress,
         transparentBackground: true,
       });
 
       if (onProgress) {
-        onProgress(Math.round(progress * 100));
+        onProgress(Math.round(overallProgress * 100));
       }
 
-      if (elapsedSec < durationSec + 0.1) {
+      if (elapsedSec < totalDurationSec + 0.1) {
         animId = requestAnimationFrame(recordLoop);
       } else {
         mediaRecorder.stop();

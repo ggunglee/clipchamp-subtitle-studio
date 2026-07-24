@@ -131,7 +131,8 @@ export interface SubtitleConfig {
   
   // Animation
   animation: AnimationType;
-  animationDuration: number; // in seconds
+  animationDuration: number; // entrance animation duration in seconds
+  holdDuration?: number; // hold/still display duration after animation completes (in seconds)
   animationDelay: number;
   animTargetMode?: AnimTargetMode;
 

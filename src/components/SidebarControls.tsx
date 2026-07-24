@@ -962,20 +962,39 @@ export const SidebarControls: React.FC<SidebarControlsProps> = ({
               </div>
             </div>
 
-            {/* Animation Duration Slider */}
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                애니메이션 지속 시간 ({config.animationDuration}초)
-              </label>
-              <input
-                type="range"
-                min={0.3}
-                max={3.0}
-                step={0.1}
-                value={config.animationDuration}
-                onChange={(e) => updateField('animationDuration', parseFloat(e.target.value))}
-                className="w-full accent-indigo-500 cursor-pointer"
-              />
+            {/* Animation Duration & Hold Duration Sliders */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-950 p-3 rounded-xl border border-slate-800">
+              <div>
+                <label className="block text-xs font-semibold text-indigo-300 mb-1">
+                  ✨ 모션 등장 시간 ({config.animationDuration || 1.0}초)
+                </label>
+                <input
+                  type="range"
+                  min={0.3}
+                  max={3.0}
+                  step={0.1}
+                  value={config.animationDuration || 1.0}
+                  onChange={(e) => updateField('animationDuration', parseFloat(e.target.value))}
+                  className="w-full accent-indigo-500 cursor-pointer"
+                />
+                <span className="text-[10px] text-slate-400">자막이 튀어나오는 등장 속도</span>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-amber-300 mb-1">
+                  📌 모션 완결 후 화면 유지 ({config.holdDuration !== undefined ? config.holdDuration : 1.5}초)
+                </label>
+                <input
+                  type="range"
+                  min={0.0}
+                  max={10.0}
+                  step={0.5}
+                  value={config.holdDuration !== undefined ? config.holdDuration : 1.5}
+                  onChange={(e) => updateField('holdDuration', parseFloat(e.target.value))}
+                  className="w-full accent-amber-500 cursor-pointer"
+                />
+                <span className="text-[10px] text-slate-400">등장 완료 후 자막이 화면에 멈춰있는 시간</span>
+              </div>
             </div>
 
             {/* Sound Effect (SFX) Selector */}

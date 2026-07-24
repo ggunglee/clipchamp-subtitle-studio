@@ -42,22 +42,27 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
   useEffect(() => {
     let active = true;
 
+    const animDur = config.animationDuration || 1.0;
+    const holdDur = config.holdDuration !== undefined ? config.holdDuration : 1.5;
+    const totalClipDuration = animDur + holdDur;
+
     const loop = (time: number) => {
       if (!active) return;
 
       if (isPlaying) {
         const elapsedSec = (time - startTimeRef.current) / 1000;
-        const totalDuration = config.animationDuration || 1.0;
-        const currentProg = (elapsedSec % totalDuration) / totalDuration;
+        const currentClipSec = elapsedSec % totalClipDuration;
+        const currentProg = currentClipSec / totalClipDuration;
         setProgress(currentProg);
       }
 
       if (canvasRef.current) {
+        const animProgress = Math.min(1.0, (progress * totalClipDuration) / animDur);
         renderSubtitleToCanvas({
           canvas: canvasRef.current,
           config,
           ratio,
-          progress: isPlaying ? progress : progress,
+          progress: animProgress,
           transparentBackground: true,
         });
       }
@@ -322,8 +327,8 @@ export const PreviewCanvas: React.FC<PreviewCanvasProps> = ({
               }}
               className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500"
             />
-            <span className="text-[11px] font-mono text-slate-400 w-12 text-right">
-              {(progress * (config.animationDuration || 1.5)).toFixed(1)}s
+            <span className="text-[11px] font-mono text-slate-400 w-16 text-right">
+              {(progress * ((config.animationDuration || 1.0) + (config.holdDuration !== undefined ? config.holdDuration : 1.5))).toFixed(1)}s
             </span>
           </div>
         </div>
