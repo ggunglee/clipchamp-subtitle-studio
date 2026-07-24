@@ -54,8 +54,8 @@ export async function exportAsWebMVideo(
   tempCanvas.width = width;
   tempCanvas.height = height;
 
-  const fps = 30;
-  const totalFrames = Math.round(fps * config.animationDuration);
+  const fps = 60;
+  const durationSec = Math.max(0.5, config.animationDuration || 1.5);
   const stream = tempCanvas.captureStream(fps);
 
   // Web Audio Context & Destination Node for Recording Audio Track
@@ -84,22 +84,27 @@ export async function exportAsWebMVideo(
   };
 
   return new Promise((resolve, reject) => {
+    let animId: number;
+
     mediaRecorder.onstop = () => {
+      cancelAnimationFrame(animId);
       exportAudioCtx.close();
       const blob = new Blob(chunks, { type: 'video/webm' });
       resolve(blob);
     };
 
     mediaRecorder.onerror = (err) => {
+      cancelAnimationFrame(animId);
       exportAudioCtx.close();
       reject(err);
     };
 
-    // Trigger SFX directly into Recording Audio Destination
+    mediaRecorder.start();
+
+    // Trigger SFX directly into Recording Audio Destination at exact start
     if (!sfx.getMuted() && config.sfxType !== 'none') {
       if (config.animation === 'typewriter' || config.sfxType === 'click') {
         const textToType = config.mainText || '오늘의 하이라이트!';
-        const durationSec = config.animationDuration || 1.5;
         sfx.playTypewriterSequence(textToType, durationSec, exportAudioCtx, audioDest);
       } else {
         let sfxType: SFXType = config.sfxType && config.sfxType !== 'auto' ? config.sfxType : 'pop';
@@ -120,31 +125,32 @@ export async function exportAsWebMVideo(
       }
     }
 
-    mediaRecorder.start();
+    const startTime = performance.now();
 
-    let frameIndex = 0;
-    const interval = setInterval(() => {
-      if (frameIndex >= totalFrames) {
-        clearInterval(interval);
-        mediaRecorder.stop();
-        return;
-      }
+    const recordLoop = (timestamp: number) => {
+      const elapsedSec = (timestamp - startTime) / 1000;
+      const progress = Math.min(1.0, elapsedSec / durationSec);
 
-      const progress = frameIndex / (fps * config.animationDuration);
       renderSubtitleToCanvas({
         canvas: tempCanvas,
         config,
         ratio,
-        progress: Math.min(1.0, progress),
+        progress,
         transparentBackground: true,
       });
 
       if (onProgress) {
-        onProgress(Math.round((frameIndex / totalFrames) * 100));
+        onProgress(Math.round(progress * 100));
       }
 
-      frameIndex++;
-    }, 1000 / fps);
+      if (elapsedSec < durationSec + 0.1) {
+        animId = requestAnimationFrame(recordLoop);
+      } else {
+        mediaRecorder.stop();
+      }
+    };
+
+    animId = requestAnimationFrame(recordLoop);
   });
 }
 
